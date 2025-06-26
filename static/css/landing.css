@@ -1,0 +1,234 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Malgun Gothic', Arial, sans-serif;
+    background-color: #FFFFFF;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    background-color: #FEF200;
+    color: #040707;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    border-bottom: 1px solid rgba(4, 7, 7, 0.2);
+}
+
+.hamburger {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.hamburger:hover {
+    background-color: rgba(4, 7, 7, 0.1);
+}
+
+.hamburger div {
+    width: 25px;
+    height: 3px;
+    background-color: #040707;
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+.hamburger.active div:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.active div:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active div:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.user-info {
+    background-color: #FFFFFF;
+    padding: 8px 15px;
+    border-radius: 4px;
+    border: 1px solid rgba(4, 7, 7, 0.2);
+    font-size: 14px;
+    color: #040707;
+    font-weight: bold;
+}
+
+.user-role {
+    background-color: #ED1C24;
+    color: #FFFFFF;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    left: -300px;
+    width: 300px;
+    height: calc(100vh - 60px);
+    background-color: #FFFFFF;
+    border-right: 1px solid rgba(4, 7, 7, 0.2);
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-section {
+    border-bottom: 1px solid rgba(4, 7, 7, 0.1);
+}
+
+.main-menu {
+    background-color: #FFFFFF;
+    color: #040707;
+    padding: 15px 20px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+    border-bottom: 1px solid rgba(4, 7, 7, 0.05);
+}
+
+.main-menu:hover {
+    background-color: #FFFAD1;
+}
+
+.main-menu.active {
+    background-color: #FEF200;
+    border-left: 5px solid #ED1C24;
+}
+
+.menu-arrow {
+    transition: transform 0.3s;
+    color: #040707;
+}
+
+.menu-arrow.rotated {
+    transform: rotate(90deg);
+}
+
+.sub-menu {
+    background-color: #FFFFFF;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.sub-menu.active {
+    max-height: 500px;
+}
+
+.sub-menu-item {
+    padding: 12px 20px 12px 40px;
+    color: #040707;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(4, 7, 7, 0.03);
+    transition: background-color 0.3s, padding-left 0.3s;
+    text-align: right;
+}
+
+.sub-menu-item:hover {
+    background-color: #FFFAD1;
+    padding-left: 45px;
+}
+
+/* Main Content */
+.main-content {
+    margin-top: 60px;
+    padding: 30px;
+    transition: margin-left 0.3s ease;
+    min-height: calc(100vh - 60px);
+}
+
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(4, 7, 7, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-title {
+    text-align: center;
+    color: #040707;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.logo-placeholder {
+    width: 200px;
+    height: 150px;
+    background-color: #FFFAD1;
+    border: 2px dashed rgba(4, 7, 7, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #040707;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 280px;
+        left: -280px;
+    }
+    
+    .main-content {
+        padding: 20px 15px;
+    }
+    
+    .user-info {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
