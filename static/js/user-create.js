@@ -3,6 +3,7 @@ function initUserCreatePage() {
     $(document).off('click', '#cancelBtn');
     $(document).off('focus blur input change', '.form-input, .form-select');
 
+    setupRoleOptions();
 
     $(document).on('submit', '#userCreateForm', function(e) {
         console.log('폼 제출 이벤트 발생');
@@ -48,6 +49,7 @@ function initUserCreatePage() {
                         alert(`사용자가 성공적으로 생성되었습니다!\n\nID: ${response.data.userId}\n\n임시 비밀번호: ${response.data.defaultPassword}`);
                         $('#userCreateForm')[0].reset();
                         $('.form-input, .form-select').css('border-color', 'rgba(4, 7, 7, 0.2)');
+                        setupRoleOptions();
                     } else {
                         alert(response.message);
                     }
@@ -79,6 +81,7 @@ function initUserCreatePage() {
         if (confirm('입력한 내용이 모두 삭제됩니다. 계속하시겠습니까?')) {
             $('#userCreateForm')[0].reset();
             $('.form-input, .form-select').css('border-color', 'rgba(4, 7, 7, 0.2)');
+            setupRoleOptions();
         }
     });
 
@@ -96,4 +99,33 @@ function initUserCreatePage() {
             $input.css('border-color', 'rgba(4, 7, 7, 0.2)');
         }
     });
+
+    // ! 사용자 권한에 따른 역할 옵션 설정
+    function setupRoleOptions() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUserRole = currentUser.roleId;
+        const $roleSelect = $('#userRole');
+        
+        // 기존 옵션 제거 (기본 옵션 제외)
+        $roleSelect.find('option:not(:first)').remove();
+        
+        // 권한별 생성 가능한 역할 정의
+        let availableRoles = [];
+        
+        if (currentUserRole === 1) { // ROOT
+            availableRoles = [
+                { value: '2', text: 'ADMIN (관리자)' }
+            ];
+        } else if (currentUserRole === 2) { // ADMIN
+            availableRoles = [
+                { value: '3', text: 'MANAGER (매니저)' },
+                { value: '4', text: 'USER (사용자)' }
+            ];
+        }
+        
+        // 옵션 추가
+        availableRoles.forEach(role => {
+            $roleSelect.append(`<option value="${role.value}">${role.text}</option>`);
+        });
+    }
 }
