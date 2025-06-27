@@ -1,0 +1,297 @@
+.user-create-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(4, 7, 7, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.user-create-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #FEF200 0%, #ED1C24 50%, #FEF200 100%);
+}
+
+.page-title {
+    color: #040707;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+    margin-top: 20px;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #FEF200;
+}
+
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    background-color: #FAFAFA;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(4, 7, 7, 0.1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row:last-child {
+    background-color: #FAFAFA;
+}
+
+.form-group {
+    flex: 1;
+    position: relative;
+    animation: slideUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    background-color: #FFFFFF;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(4, 7, 7, 0.1);
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+
+.form-group:empty {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    visibility: hidden;
+}
+
+.form-label {
+    background-color: #FEF200;
+    color: #040707;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 0;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 0;
+    font-size: 16px;
+    color: #040707;
+    background-color: #FFFFFF;
+    transition: all 0.3s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    background-color: #fffef0;
+    box-shadow: inset 0 0 0 2px #FEF200;
+}
+
+.form-input::placeholder {
+    color: rgba(4, 7, 7, 0.5);
+}
+
+.form-select {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 0;
+    font-size: 16px;
+    color: #040707;
+    background-color: #FFFFFF;
+    transition: all 0.3s;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.form-select:focus {
+    background-color: #fffef0;
+    box-shadow: inset 0 0 0 2px #FEF200;
+}
+
+.status-display {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 0;
+    font-size: 16px;
+    color: #040707;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #28a745;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: center;
+    animation: slideUp 0.6s ease forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+    transform: translateY(20px);
+    padding: 20px 0;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(4, 7, 7, 0.1);
+}
+
+.btn {
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #FEF200 0%, #ffeb3b 100%);
+    color: #040707;
+    box-shadow: 0 4px 12px rgba(254, 242, 0, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #ffeb3b 0%, #FEF200 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(254, 242, 0, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* 폼 그룹 호버 효과 강화 */
+.form-group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* 에러 스타일 개선 */
+.form-group.error {
+    border-color: #ED1C24;
+    box-shadow: 0 0 0 2px rgba(237, 28, 36, 0.2);
+}
+
+.form-input.error {
+    background-color: #fff5f5;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .user-create-container {
+        padding: 30px 20px;
+        margin: 15px;
+    }
+
+    .user-form {
+        padding: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-create-container {
+        padding: 25px 15px;
+        margin: 10px;
+    }
+
+    .user-form {
+        padding: 15px;
+    }
+
+    .form-input, .form-select, .status-display {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
