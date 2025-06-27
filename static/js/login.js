@@ -3,36 +3,51 @@ $(document).ready(function() {
     $('#loginForm').on('submit', function(e) {
         e.preventDefault();
         
-        const $inputs = $(this).find('.form-input');
-        let isValid = true;
-        
-        // 간단한 유효성 검사
-        $inputs.each(function() {
-            const $input = $(this);
-            if (!$input.val().trim()) {
-                $input.css('border-color', '#ED1C24');
-                isValid = false;
-            } else {
-                $input.css('border-color', 'rgba(4, 7, 7, 0.2)');
+        $.ajax({
+            url: '/api/test',
+            method: 'GET',
+            success: function(response) {
+                console.log('✓ DB 연결 성공:', response);
+                console.log('ACCESS 테이블 데이터:', response.data);
+            },
+            error: function(xhr, status, error) {
+                console.error('✗ DB 연결 실패:', error);
+                console.error('에러 상세:', xhr.responseText);
             }
         });
+
+        // const $inputs = $(this).find('.form-input');
+        // let isValid = true;
         
-        if (isValid) {
-            // 로그인 버튼 로딩 상태
-            const $button = $(this).find('.login-button');
-            const originalText = $button.text();
-            $button.text('로그인 중...').prop('disabled', true);
+        // // 간단한 유효성 검사
+        // $inputs.each(function() {
+        //     const $input = $(this);
+        //     if (!$input.val().trim()) {
+        //         $input.css('border-color', '#ED1C24');
+        //         isValid = false;
+        //     } else {
+        //         $input.css('border-color', 'rgba(4, 7, 7, 0.2)');
+        //     }
+        // });
+        
+        // if (isValid) {
+        //     // 로그인 버튼 로딩 상태
+        //     // const $button = $(this).find('.login-button');
+        //     // const originalText = $button.text();
+        //     // $button.text('로그인 중...').prop('disabled', true);
+
             
-            // TODO: 실제 로그인 API 호출
-            setTimeout(function() {
-                alert('로그인 성공! (데모)');
-                $button.text(originalText).prop('disabled', false);
+            
+        //     // // TODO: 실제 로그인 API 호출
+        //     // setTimeout(function() {
+        //     //     alert('로그인 성공! (데모)');
+        //     //     $button.text(originalText).prop('disabled', false);
                 
-                window.location.href = 'landing.html';
-            }, 2000);
-        } else {
-            alert('모든 필드를 입력해주세요.');
-        }
+        //     //     window.location.href = 'landing';
+        //     // }, 2000);
+        // } else {
+        //     alert('모든 필드를 입력해주세요.');
+        // }
     });
     
     // Enter 키로 로그인
