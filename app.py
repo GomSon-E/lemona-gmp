@@ -1,39 +1,18 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+import hashlib
+from datetime import datetime
 
 import mysql.connector
 from mysql.connector import Error
 from contextlib import contextmanager
 
+from user_service import create_user
+
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-MYSQL_CONFIG = {
-    'host': 'localhost',
-    'database': 'LEMONA_GMP',
-    'user': 'root',
-    'password': '1234',
-    'port': 3306,
-    'charset': 'utf8mb4',
-    'collation': 'utf8mb4_unicode_ci'
-}
-
-@contextmanager
-def get_db_connection():
-    connection = None
-    try:
-        connection = mysql.connector.connect(**MYSQL_CONFIG)
-        yield connection
-    except Error as e:
-        print(f"MySQL 연결 오류: {e}")
-        if connection:
-            connection.rollback()
-        raise HTTPException(status_code=500, detail="데이터베이스 연결 오류")
-    finally:
-        if connection and connection.is_connected():
-            connection.close()
 
 @app.get("/")
 async def root_page():
@@ -46,6 +25,10 @@ async def login_page():
 @app.get("/landing")
 async def login_page():
     return FileResponse('static/html/landing.html')
+
+@app.post("/api/users")
+async def create_user_api(request: Request):
+    return await create_user(request)
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
