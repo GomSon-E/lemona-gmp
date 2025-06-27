@@ -18,18 +18,35 @@ $(document).ready(function() {
         });
         
         if (isValid) {
-            // 로그인 버튼 로딩 상태
-            const $button = $(this).find('.login-button');
+            const userId = $(this).find('input[type="text"]').val().trim();
+            const password = $(this).find('input[type="password"]').val().trim();
+            
+            const $button = $('.login-button');
             const originalText = $button.text();
+            
             $button.text('로그인 중...').prop('disabled', true);
 
-            // TODO: 실제 로그인 API 호출
-            setTimeout(function() {
-                alert('로그인 성공! (데모)');
-                $button.text(originalText).prop('disabled', false);
-                
-                window.location.href = 'landing';
-            }, 2000);
+            $.ajax({
+                url: '/api/login',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ userId, password }),
+                success: function(response) {
+                    if (response.success) {
+                        localStorage.setItem('currentUser', JSON.stringify(response.data));
+                        window.location.href = '/landing';
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || '로그인 중 오류가 발생했습니다.';
+                    alert(errorMessage);
+                },
+                complete: function() {
+                    $button.text(originalText).prop('disabled', false);
+                }
+            });
         } else {
             alert('모든 필드를 입력해주세요.');
         }

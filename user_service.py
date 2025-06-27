@@ -5,6 +5,65 @@ from datetime import datetime
 from mysql.connector import Error
 from database import get_db_connection
 
+# ! 사용자 로그인
+async def login_user(request: Request):
+    try:
+        login_data = await request.json()
+        user_id = login_data['userId']
+        password = login_data['password']
+        
+        with get_db_connection() as connection:
+            cursor = connection.cursor(dictionary=True)
+            
+            # 사용자 정보 조회 및 검증
+            query = """
+                SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, r.ROLE_NAME
+                FROM USER u
+                LEFT JOIN ROLE r ON u.ROLE_ID = r.ROLE_ID
+                WHERE u.USER_ID = %s AND u.STATUS = TRUE
+            """
+            cursor.execute(query, (user_id,))
+            user = cursor.fetchone()
+            
+            if not user:
+                return JSONResponse({
+                    "success": False,
+                    "message": "존재하지 않거나 비활성화된 사용자입니다."
+                })
+            
+            # 비밀번호 확인
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            if user['PW'] != hashed_password:
+                return JSONResponse({
+                    "success": False,
+                    "message": "비밀번호가 일치하지 않습니다."
+                })
+            
+            # 로그인 성공
+            return JSONResponse({
+                "success": True,
+                "message": "로그인 성공",
+                "data": {
+                    "userId": user['USER_ID'],
+                    "name": user['NAME'],
+                    "division": user['DIVISION'],
+                    "roleName": user['ROLE_NAME']
+                }
+            })
+            
+    except Error as e:
+        print(f"로그인 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "로그인 처리 중 오류가 발생했습니다."
+        })
+    except Exception as e:
+        print(f"예상치 못한 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "서버 내부 오류가 발생했습니다."
+        })
+
 # ! 사용자 생성
 async def create_user(request: Request):
     try:
