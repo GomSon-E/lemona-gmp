@@ -17,9 +17,9 @@
             <div></div>
         </div>
         <div class="user-info">
-            <span class="user-role">admin</span> | 
-            <span class="user-id">KCS</span> | 
-            <span class="user-name">김철수</span>
+            <span class="user-role"></span> | 
+            <span class="user-id"></span> | 
+            <span class="user-name"></span>
         </div>
     </header>
 
@@ -28,59 +28,7 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <!-- 조회 페이지 -->
-        <div class="menu-section">
-            <div class="main-menu" data-target="inquiry-menu">
-                이력 조회
-                <span class="menu-arrow">▶</span>
-            </div>
-            <div class="sub-menu" id="inquiry-menu">
-                <div class="sub-menu-item" data-page="equipment-history">설비 가동 이력 조회</div>
-                <div class="sub-menu-item" data-page="process-history">공정 값 변경 이력 조회</div>
-                <div class="sub-menu-item" data-page="alarm-history">설비 알람 이력 조회</div>
-                <div class="sub-menu-item" data-page="user-operation">사용자 조작 이력 조회</div>
-                <div class="sub-menu-item" data-page="report-history">보고서 이력 조회</div>
-                <div class="sub-menu-item" data-page="login-history">접속 이력 조회</div>
-                <div class="sub-menu-item" data-page="user-history">사용자 관리 이력 조회</div>
-                <div class="sub-menu-item" data-page="data-history">데이터 관리 이력 조회</div>
-            </div>
-        </div>
-
-        <!-- 사용자 관리 페이지 -->
-        <div class="menu-section">
-            <div class="main-menu" data-target="user-menu">
-                사용자 관리
-                <span class="menu-arrow">▶</span>
-            </div>
-            <div class="sub-menu" id="user-menu">
-                <div class="sub-menu-item" data-page="user-create">사용자 생성</div>
-                <div class="sub-menu-item" data-page="user-update">사용자 수정</div>
-                <div class="sub-menu-item" data-page="access-update">권한별 접근 가능 페이지 관리</div>
-                <div class="sub-menu-item" data-page="password-change">비밀번호 변경</div>
-            </div>
-        </div>
-
-        <!-- 감사 추적 페이지 -->
-        <div class="menu-section">
-            <div class="main-menu" data-target="audit-menu">
-                감사 추적
-                <span class="menu-arrow">▶</span>
-            </div>
-            <div class="sub-menu" id="audit-menu">
-                <div class="sub-menu-item" data-page="audit-trail">Audit Trail</div>
-            </div>
-        </div>
-
-        <!-- 데이터 관리 페이지 -->
-        <div class="menu-section">
-            <div class="main-menu" data-target="data-menu">
-                데이터 관리
-                <span class="menu-arrow">▶</span>
-            </div>
-            <div class="sub-menu" id="data-menu">
-                <div class="sub-menu-item" data-page="backup-restore">데이터 백업/복원</div>
-            </div>
-        </div>
+        <div id="dynamicMenu"></div>
     </aside>
 
     <!-- Main Content -->

@@ -9,7 +9,7 @@ import mysql.connector
 from mysql.connector import Error
 from contextlib import contextmanager
 
-from user_service import login_user, create_user
+from user_service import login_user, get_access, create_user
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -33,6 +33,10 @@ async def login_api(request: Request):
 @app.post("/api/users")
 async def create_user_api(request: Request):
     return await create_user(request)
+
+@app.get("/api/access/{role_id}")
+async def get_access_api(role_id: str):
+    return await get_access(role_id)
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
