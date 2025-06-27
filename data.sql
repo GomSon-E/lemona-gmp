@@ -58,16 +58,16 @@ INSERT INTO PAGE (PAGE_LINK, MENU_NAME, PAGE_NAME) VALUES
 ('value-history', '이력 조회', '공정 값 변경 이력 조회'),
 ('alarm-history', '이력 조회', '설비 알람 이력 조회'),
 ('user-operation', '이력 조회', '사용자 조작 이력 조회'),
-('/history/report', '이력 조회', '보고서 이력 조회'),
-('/history/access', '이력 조회', '접속 이력 조회'),
-('/history/user-management', '이력 조회', '사용자 관리 이력 조회'),
-('/history/data-management', '이력 조회', '데이터 관리 이력 조회'),
-('/user/create', '사용자 관리', '사용자 생성'),
-('/user/modify', '사용자 관리', '사용자 수정'),
-('/user/role-page', '사용자 관리', '권한별 접근 가능 페이지 관리'),
-('/user/password-change', '사용자 관리', '비밀번호 변경'),
-('/audit/trail', '감사 추적', 'Audit Trail'),
-('/data/backup-restore', '데이터 관리', '데이터 백업/복원');
+('repot-history', '이력 조회', '보고서 이력 조회'),
+('login-history', '이력 조회', '접속 이력 조회'),
+('user-history', '이력 조회', '사용자 관리 이력 조회'),
+('data-history', '이력 조회', '데이터 관리 이력 조회'),
+('user-create', '사용자 관리', '사용자 생성'),
+('user-update', '사용자 관리', '사용자 수정'),
+('access-update', '사용자 관리', '권한별 접근 가능 페이지 관리'),
+('password-change', '사용자 관리', '비밀번호 변경'),
+('audit-trail', '감사 추적', 'Audit Trail'),
+('backup-restore', '데이터 관리', '데이터 백업/복원');
 
 INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('1', '9'),
@@ -107,3 +107,4 @@ INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 SELECT * FROM ROLE;
 SELECT * FROM PAGE;
 SELECT * FROM ACCESS;
+SELECT * FROM USER;
