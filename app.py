@@ -46,27 +46,6 @@ async def login_page():
 @app.get("/landing")
 async def login_page():
     return FileResponse('static/html/landing.html')
-
-@app.get("/api/test")
-async def test_database():
-    try:
-        with get_db_connection() as connection:
-            cursor = connection.cursor(buffered=True, dictionary=True)
-            cursor.execute("SELECT * FROM PAGE LIMIT 1;")
-            result = cursor.fetchone()
-            cursor.close()
-            
-            print("DB 연결 성공:", result)
-            
-            return {
-                "message": "데이터베이스 연결 성공",
-                "count": result,
-                "status": "ok"
-            }
-            
-    except Exception as e:
-        print(f"오류: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
