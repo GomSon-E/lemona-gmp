@@ -187,9 +187,9 @@ function initPasswordChangePage() {
             const requirement = requirements[index];
             
             if (requirement && requirement.test) {
-                $icon.css('background-color', '#28a745').text('✓');
+                $icon.css('background-color', '#28a745').html('✓');
             } else {
-                $icon.css('background-color', '#dc3545').text('X');
+                $icon.css('background-color', '#dc3545').html('✗');
             }
         });
     }
