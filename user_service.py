@@ -17,7 +17,7 @@ async def login_user(request: Request):
             
             # 사용자 정보 조회 및 검증
             query = """
-                SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, u.ROLE_ID, r.ROLE_NAME
+                SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, u.ROLE_ID, r.ROLE_NAME, u.PW_UPDATE_DT
                 FROM USER u
                 LEFT JOIN ROLE r ON u.ROLE_ID = r.ROLE_ID
                 WHERE u.USER_ID = %s AND u.STATUS = TRUE
@@ -39,8 +39,25 @@ async def login_user(request: Request):
                     "message": "비밀번호가 일치하지 않습니다."
                 })
             
+            # 비밀번호 변경 필요 여부 체크
+            password_change_required = False
+            password_change_reason = ""
+            
+            # 1. 초기 비밀번호 사용 체크
+            if password == '1234!':
+                password_change_required = True
+                password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
+            
+            # 2. 90일 경과 체크
+            if user['PW_UPDATE_DT']:
+                from datetime import timedelta
+                ninety_days_ago = datetime.now() - timedelta(days=90)
+                if user['PW_UPDATE_DT'] < ninety_days_ago:
+                    password_change_required = True
+                    password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
+            
             # 로그인 성공
-            return JSONResponse({
+            response_data = {
                 "success": True,
                 "message": "로그인 성공",
                 "data": {
@@ -48,9 +65,13 @@ async def login_user(request: Request):
                     "name": user['NAME'],
                     "division": user['DIVISION'],
                     "roleId": user['ROLE_ID'],
-                    "roleName": user['ROLE_NAME']
+                    "roleName": user['ROLE_NAME'],
+                    "passwordChangeRequired": password_change_required,
+                    "passwordChangeReason": password_change_reason
                 }
-            })
+            }
+
+            return JSONResponse(response_data)
             
     except Error as e:
         print(f"로그인 오류: {e}")

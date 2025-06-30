@@ -1,6 +1,9 @@
 $(document).ready(function() {
     // 초기화
     if (!checkUserLogin()) return;
+
+    // 비밀번호 변경 강제 체크
+    checkForcePasswordChange();
     
     // 사용자 로그인 확인
     function checkUserLogin() {
@@ -21,6 +24,19 @@ $(document).ready(function() {
             console.error('사용자 정보 파싱 오류:', error);
             logout();
             return false;
+        }
+    }
+
+    // ! 비밀번호 변경 강제 체크
+    function checkForcePasswordChange() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        if (currentUser.passwordChangeRequired) {              
+            // 비밀번호 변경 페이지 로드
+            setTimeout(() => {
+                loadPage('password-change');
+                alert(currentUser.passwordChangeReason);
+            }, 300);
         }
     }
 
