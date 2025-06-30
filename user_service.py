@@ -159,3 +159,65 @@ async def create_user(request: Request):
             "success": False,
             "message": "서버 내부 오류가 발생했습니다."
         })
+    
+# ! 비밀번호 변경
+async def change_password(request: Request):
+    try:
+        password_data = await request.json()
+        user_id = password_data['userId']
+        current_password = password_data['currentPassword']
+        new_password = password_data['newPassword']
+        
+        with get_db_connection() as connection:
+            cursor = connection.cursor(dictionary=True)
+            
+            # 현재 비밀번호 확인
+            query = "SELECT PW FROM USER WHERE USER_ID = %s AND STATUS = TRUE"
+            cursor.execute(query, (user_id,))
+            user = cursor.fetchone()
+            
+            if not user:
+                return JSONResponse({
+                    "success": False,
+                    "message": "사용자를 찾을 수 없습니다."
+                })
+            
+            # 현재 비밀번호 검증
+            current_hashed = hashlib.sha256(current_password.encode()).hexdigest()
+            if user['PW'] != current_hashed:
+                return JSONResponse({
+                    "success": False,
+                    "message": "현재 비밀번호가 일치하지 않습니다."
+                })
+            
+            # 새 비밀번호 해시화
+            new_hashed = hashlib.sha256(new_password.encode()).hexdigest()
+            
+            # 비밀번호 업데이트
+            current_time = datetime.now()
+            update_query = """
+                UPDATE USER 
+                SET PW = %s, PW_UPDATE_DT = %s, UPDATE_DT = %s 
+                WHERE USER_ID = %s
+            """
+            
+            cursor.execute(update_query, (new_hashed, current_time, current_time, user_id))
+            connection.commit()
+            
+            return JSONResponse({
+                "success": True,
+                "message": "비밀번호가 성공적으로 변경되었습니다."
+            })
+            
+    except Error as e:
+        print(f"비밀번호 변경 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "비밀번호 변경 중 오류가 발생했습니다."
+        })
+    except Exception as e:
+        print(f"예상치 못한 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "서버 내부 오류가 발생했습니다."
+        })

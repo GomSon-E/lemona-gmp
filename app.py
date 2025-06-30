@@ -1,15 +1,9 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-import hashlib
-from datetime import datetime
 
-import mysql.connector
-from mysql.connector import Error
-from contextlib import contextmanager
-
-from user_service import login_user, get_access, create_user
+from user_service import login_user, get_access, create_user, change_password
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -33,6 +27,10 @@ async def login_api(request: Request):
 @app.post("/api/users")
 async def create_user_api(request: Request):
     return await create_user(request)
+
+@app.put("/api/users/password")
+async def change_password_api(request: Request):
+    return await change_password(request)
 
 @app.get("/api/access/{role_id}")
 async def get_access_api(role_id: str):
