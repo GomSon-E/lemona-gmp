@@ -1,7 +1,7 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import hashlib
-from datetime import datetime
+from datetime import date, timedelta
 from mysql.connector import Error
 from database import get_db_connection
 
@@ -50,8 +50,7 @@ async def login_user(request: Request):
             
             # 2. 90일 경과 체크
             if user['PW_UPDATE_DT']:
-                from datetime import timedelta
-                ninety_days_ago = datetime.now() - timedelta(days=90)
+                ninety_days_ago = date.today() - timedelta(days=90)
                 if user['PW_UPDATE_DT'] < ninety_days_ago:
                     password_change_required = True
                     password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
@@ -104,7 +103,7 @@ async def create_user(request: Request):
                 })
             
             # 사용자 생성
-            current_time = datetime.now()
+            current_time = date.today()
             insert_query = """
                 INSERT INTO USER (USER_ID, PW, NAME, DIVISION, ROLE_ID, CREATE_DT, UPDATE_DT)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -178,7 +177,7 @@ async def change_password(request: Request):
             new_hashed = hashlib.sha256(new_password.encode()).hexdigest()
             
             # 비밀번호 업데이트
-            current_time = datetime.now()
+            current_time = date.today()
             update_query = """
                 UPDATE USER 
                 SET PW = %s, PW_UPDATE_DT = %s, UPDATE_DT = %s 
