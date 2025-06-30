@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from user_service import login_user, create_user, change_password
+from user_service import login_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
@@ -25,6 +25,18 @@ async def login_page():
 async def login_api(request: Request):
     return await login_user(request)
 
+@app.get("/api/users")
+async def get_all_users_api():
+    return await get_all_users()
+
+@app.get("/api/users/{user_id}")
+async def get_user_api(user_id: str):
+    return await get_user(user_id)
+
+@app.put("/api/users/{user_id}")
+async def update_user_api(user_id: str, request: Request):
+    return await update_user(user_id, request)
+
 @app.post("/api/users")
 async def create_user_api(request: Request):
     return await create_user(request)
@@ -32,6 +44,10 @@ async def create_user_api(request: Request):
 @app.put("/api/users/password")
 async def change_password_api(request: Request):
     return await change_password(request)
+
+@app.put("/api/users/password/reset")
+async def reset_user_password_api(request: Request):
+    return await reset_password(request)
 
 @app.get("/api/pages")
 async def get_all_pages_api():

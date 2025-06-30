@@ -1,0 +1,75 @@
+<div class="user-update-container">
+    <h1 class="page-title">사용자 수정</h1>
+    
+    <div class="search-filter-section">
+        <h3 class="section-title">검색 및 필터링</h3>
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label class="filter-label">사용자 ID</label>
+                <input type="text" class="filter-input" id="filterUserId" placeholder="사용자 ID 검색">
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">사용자명</label>
+                <input type="text" class="filter-input" id="filterUserName" placeholder="사용자명 검색">
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">부서</label>
+                <input type="text" class="filter-input" id="filterDivision" placeholder="부서 검색">
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">상태</label>
+                <select class="filter-select" id="filterStatus">
+                    <option value="">전체</option>
+                    <option value="1">활성</option>
+                    <option value="0">비활성</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">권한</label>
+                <select class="filter-select" id="filterRole">
+                    <option value="">전체</option>
+                    <option value="2">ADMIN</option>
+                    <option value="3">MANAGER</option>
+                    <option value="4">USER</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="btn btn-search" id="searchBtn">검색</button>
+                <button type="button" class="btn btn-reset" id="resetBtn">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content-section">
+        <div class="user-list-section">
+            <h3 class="section-title">사용자 목록</h3>
+            <div class="user-list-container">
+                <table class="user-table" id="userTable">
+                    <thead>
+                        <tr>
+                            <th>사용자 ID</th>
+                            <th>사용자명</th>
+                            <th>부서</th>
+                            <th>권한</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="5" class="loading-message">사용자 목록을 불러오는 중...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="user-detail-section">
+            <h3 class="section-title">사용자 상세 정보</h3>
+            <div class="user-detail-container" id="userDetailContainer">
+                <div class="no-selection-message">
+                    사용자를 선택해주세요
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
