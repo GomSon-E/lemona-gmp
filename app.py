@@ -3,8 +3,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from user_service import login_user, get_access, create_user, change_password
-from access_service import get_all_pages, update_access
+from user_service import login_user, create_user, change_password
+from access_service import get_access, get_all_pages, update_access
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
