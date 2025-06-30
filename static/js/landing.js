@@ -125,6 +125,9 @@ $(document).ready(function() {
         // 햄버거 메뉴
         $('#hamburger').click(() => toggleSidebar());
         $('#sidebarOverlay').click(() => closeSidebar());
+
+        // 로그아웃 버튼
+        $('#logoutBtn').click(() => logout());
         
         // 동적 메뉴 이벤트
         $(document).on('click', '.main-menu', function() {
@@ -176,6 +179,22 @@ $(document).ready(function() {
         $arrow.toggleClass('rotated');
     }
 
+    // ! 로그아웃 처리
+    function logout() {
+        if (confirm('로그아웃 하시겠습니까?')) {
+            // 로컬 스토리지 정리
+            localStorage.removeItem('currentUser');
+            
+            // 현재 페이지 정리
+            if (window.currentPageCleanup) {
+                window.currentPageCleanup();
+            }
+            
+            // 로그인 페이지로 이동
+            window.location.href = '/login';
+        }
+    }
+
     function handlePageNavigation(page) {
         try {
             loadPage(page);
@@ -185,6 +204,7 @@ $(document).ready(function() {
             $('.dashboard-container').html('<div class="error-message">페이지를 불러올 수 없습니다.</div>');
         }
     }
+
     // ! 페이지 로딩
     function loadPage(pageName) {
         // 기존 페이지 정리
