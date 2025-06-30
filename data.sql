@@ -92,6 +92,7 @@ INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('3', '6'),
 ('3', '7'),
 ('3', '8'),
+('3', '12'),
 ('3', '13'),
 ('4', '1'),
 ('4', '2'),
@@ -101,6 +102,7 @@ INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('4', '6'),
 ('4', '7'),
 ('4', '8'),
+('4', '12'),
 ('4', '13');
 
 SELECT * FROM ROLE;
