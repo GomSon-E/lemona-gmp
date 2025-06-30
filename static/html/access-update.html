@@ -1,0 +1,33 @@
+<div class="access-update-container">
+    <h1 class="page-title">권한별 접근 가능 페이지 관리</h1>
+    
+    <div class="role-selection">
+        <div class="form-group">
+            <label class="form-label">권한 선택</label>
+            <select class="form-select" id="roleSelect">
+                <option value="">권한을 선택하세요</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="access-management" id="accessManagement">
+        <div class="current-access">
+            <h3 class="section-title">현재 접근 가능한 페이지</h3>
+            <div class="page-list" id="currentPages">
+                <div class="empty-message">권한을 선택해주세요.</div>
+            </div>
+        </div>
+
+        <div class="available-pages">
+            <h3 class="section-title">추가 가능한 페이지</h3>
+            <div class="page-list" id="availablePages">
+                <div class="empty-message">권한을 선택해주세요.</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="btn btn-primary" id="saveBtn" disabled>변경사항 저장</button>
+            <button type="button" class="btn btn-secondary" id="resetBtn" disabled>초기화</button>
+        </div>
+    </div>
+</div>

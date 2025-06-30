@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from user_service import login_user, get_access, create_user, change_password
+from access_service import get_all_pages, update_access
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -32,9 +33,17 @@ async def create_user_api(request: Request):
 async def change_password_api(request: Request):
     return await change_password(request)
 
+@app.get("/api/pages")
+async def get_all_pages_api():
+    return await get_all_pages()
+
 @app.get("/api/access/{role_id}")
 async def get_access_api(role_id: str):
     return await get_access(role_id)
+
+@app.put("/api/access")
+async def update_access_api(request: Request):
+    return await update_access(request)
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
