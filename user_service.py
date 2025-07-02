@@ -43,17 +43,19 @@ async def login_user(request: Request):
             password_change_required = False
             password_change_reason = ""
             
-            # 1. 초기 비밀번호 사용 체크
-            if password == '1234!':
-                password_change_required = True
-                password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
-            
-            # 2. 90일 경과 체크
-            if user['PW_UPDATE_DT']:
-                ninety_days_ago = date.today() - timedelta(days=90)
-                if user['PW_UPDATE_DT'] < ninety_days_ago:
+            # ROOT 권한(ROLE_ID = 1)은 비밀번호 변경 강제하지 않음
+            if user['ROLE_ID'] != 1:  # ROOT가 아닌 경우만 체크
+                # 1. 초기 비밀번호 사용 체크
+                if password == '1234!':
                     password_change_required = True
-                    password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
+                    password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
+                
+                # 2. 90일 경과 체크
+                if user['PW_UPDATE_DT']:
+                    ninety_days_ago = date.today() - timedelta(days=90)
+                    if user['PW_UPDATE_DT'] < ninety_days_ago:
+                        password_change_required = True
+                        password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
             
             # 로그인 성공
             response_data = {
