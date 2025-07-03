@@ -27,17 +27,188 @@ $(document).ready(function() {
         }
     }
 
+    // ! 코멘트 모달 표시
+    function showCommentModal(onCloseCallback) {
+        createCommentModal();
+        initCommentModalEvents(onCloseCallback);
+        $('#commentModal').addClass('active');
+    }
+
+    // ! 코멘트 모달 초기화
+    function initCommentModalEvents(onCloseCallback) {
+        // 모달 닫기 함수
+        window.closeCommentModal = function() {
+            $('#commentModal').removeClass('active');
+            setTimeout(() => {
+                $('#commentModal').remove();
+                
+                // 콜백 함수 실행
+                if (onCloseCallback && typeof onCloseCallback === 'function') {
+                    onCloseCallback();
+                }
+            }, 300);
+        };
+
+        // 글자 수 계산 (단순화)
+        function updateCharacterCounter() {
+            const text = $('#commentText').val();
+            const charLength = text.length;
+            const maxChars = 333;
+            const counter = $('#charCount');
+            
+            counter.text(`${charLength} / ${maxChars}자`);
+            
+            // 글자 수에 따른 색상 변경
+            if (charLength > maxChars) {
+                counter.addClass('danger').removeClass('warning');
+                $('#commentText').addClass('over-limit');
+            } else if (charLength > maxChars * 0.9) {
+                counter.addClass('warning').removeClass('danger');
+                $('#commentText').removeClass('over-limit');
+            } else {
+                counter.removeClass('warning danger');
+                $('#commentText').removeClass('over-limit');
+            }
+        }
+
+        // 이벤트 리스너 등록
+        $(document).off('input.commentModal').on('input.commentModal', '#commentText', function() {
+            updateCharacterCounter();
+            
+            // 텍스트 영역 자동 높이 조절
+            this.style.height = 'auto';
+            this.style.height = Math.max(120, this.scrollHeight) + 'px';
+        });
+
+        // 저장 버튼 클릭
+        $(document).off('click.commentModal', '#saveCommentBtn').on('click.commentModal', '#saveCommentBtn', function() {
+            const comment = $('#commentText').val().trim();
+            
+            if (!comment) {
+                alert('코멘트를 입력해주세요.');
+                return;
+            }
+            
+            if (comment.length > 333) {
+                alert('코멘트는 최대 333자까지 입력 가능합니다.');
+                return;
+            }
+            
+            // 로딩 상태 표시
+            const $button = $(this);
+            $button.addClass('loading').prop('disabled', true);
+            
+            // 실제 저장 로직 구현 예정
+            setTimeout(() => {
+                alert('코멘트가 저장되었습니다.');
+                closeCommentModal();
+            }, 1000);
+        });
+
+        // 취소 버튼 클릭
+        $(document).off('click.commentModal', '#cancelCommentBtn').on('click.commentModal', '#cancelCommentBtn', function() {
+            const comment = $('#commentText').val().trim();
+            
+            if (comment) {
+                if (confirm('입력한 내용이 저장되지 않습니다. 정말 취소하시겠습니까?')) {
+                    closeCommentModal();
+                }
+            } else {
+                closeCommentModal();
+            }
+        });
+
+        // ESC 키로 모달 닫기
+        $(document).off('keydown.commentModal').on('keydown.commentModal', function(e) {
+            if (e.key === 'Escape' && $('#commentModal').hasClass('active')) {
+                $('#cancelCommentBtn').click();
+            }
+        });
+
+        // 모달 오버레이 클릭 방지
+        $(document).off('click.commentModal', '.modal-overlay').on('click.commentModal', '.modal-overlay', function(e) {
+            if (e.target === this) {
+                // 모달 외부 클릭 시에도 완전히 차단
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        // 포커스 효과
+        $(document).off('focus.commentModal blur.commentModal', '#commentText')
+            .on('focus.commentModal', '#commentText', function() {
+                $(this).parent().css('transform', 'scale(1.02)');
+            })
+            .on('blur.commentModal', '#commentText', function() {
+                $(this).parent().css('transform', 'scale(1)');
+            });
+
+        // 초기 카운터 업데이트
+        updateCharacterCounter();
+    }
+
+    // ! 코멘트 모달 생성
+    function createCommentModal() {
+        // 기존 모달이 있으면 제거
+        $('#commentModal').remove();
+        
+        const modalHtml = `
+            <!-- 코멘트 모달 HTML -->
+            <div class="modal-overlay" id="commentModal">
+                <div class="comment-modal">
+                    <div class="modal-header"></div>
+                    
+                    <div class="modal-title-section">
+                        <h2 class="modal-title">코멘트 입력</h2>
+                        <p class="modal-subtitle">시스템 사용에 대한 코멘트를 입력해주세요.</p>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <form class="comment-form" id="commentForm">
+                            <div class="comment-form-group">
+                                <label class="comment-form-label">코멘트</label>
+                                <textarea 
+                                    class="comment-form-textarea" 
+                                    id="commentText" 
+                                    placeholder="코멘트를 입력해주세요..."
+                                    rows="5"
+                                    maxlength="333"
+                                ></textarea>
+                                <div class="character-counter">
+                                    <span class="counter-text">입력 가능한 글자 수</span>
+                                    <span class="counter-numbers" id="charCount">0 / 333자</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="comment-btn comment-btn-primary" id="saveCommentBtn">저장</button>
+                        <button type="button" class="comment-btn comment-btn-secondary" id="cancelCommentBtn">취소</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        $('body').append(modalHtml);
+    }
+
     // ! 비밀번호 변경 강제 체크
     function checkForcePasswordChange() {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-        if (currentUser.passwordChangeRequired) {              
-            // 비밀번호 변경 페이지 로드
-            setTimeout(() => {
-                loadPage('password-change');
-                alert(currentUser.passwordChangeReason);
-            }, 300);
-        }
+        // 모든 경우에 코멘트 모달을 먼저 표시
+        setTimeout(() => {
+            showCommentModal(() => {
+                // 코멘트 모달이 닫힌 후 비밀번호 변경 필요 여부 확인
+                if (currentUser.passwordChangeRequired) {
+                    setTimeout(() => {
+                        loadPage('password-change');
+                        alert(currentUser.passwordChangeReason);
+                    }, 300);
+                }
+            });
+        }, 500);
     }
 
     function displayUserInfo(user) {
