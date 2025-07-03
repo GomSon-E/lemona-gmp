@@ -57,6 +57,19 @@ async def login_user(request: Request):
                         password_change_required = True
                         password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
             
+            # 로그인 기록 저장
+            from datetime import datetime
+            current_time = datetime.now()
+            
+            login_history_query = """
+                INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
+                VALUES (%s, %s, %s)
+            """
+            
+            cursor.execute(login_history_query, ('Login Success', user_id, current_time))
+            login_history_id = cursor.lastrowid  # 방금 삽입된 로그인 기록의 ID
+            connection.commit()
+            
             # 로그인 성공
             response_data = {
                 "success": True,
@@ -68,7 +81,8 @@ async def login_user(request: Request):
                     "roleId": user['ROLE_ID'],
                     "roleName": user['ROLE_NAME'],
                     "passwordChangeRequired": password_change_required,
-                    "passwordChangeReason": password_change_reason
+                    "passwordChangeReason": password_change_reason,
+                    "loginHistoryId": login_history_id
                 }
             }
 

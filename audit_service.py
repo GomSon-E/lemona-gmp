@@ -10,6 +10,7 @@ async def create_comment(request: Request):
         comment_data = await request.json()
         content = comment_data['content']
         user_id = comment_data['userId']
+        login_history_id = comment_data['loginHistoryId']
         
         with get_db_connection() as connection:
             cursor = connection.cursor()
@@ -21,19 +22,21 @@ async def create_comment(request: Request):
             """
             
             cursor.execute(insert_query, (content, user_id))
-            connection.commit()
-            
-            # 생성된 코멘트 ID 가져오기
             comment_id = cursor.lastrowid
+            
+            # 로그인 기록에 코멘트 ID 업데이트
+            update_login_history_query = """
+                UPDATE LOGIN_HISTORY 
+                SET COMMENT_ID = %s 
+                WHERE ID = %s
+            """
+            cursor.execute(update_login_history_query, (comment_id, login_history_id))
+            
+            connection.commit()
             
             return JSONResponse({
                 "success": True,
-                "message": "코멘트가 성공적으로 저장되었습니다.",
-                "data": {
-                    "commentId": comment_id,
-                    "content": content,
-                    "userId": user_id
-                }
+                "message": "코멘트가 성공적으로 저장되었습니다."
             })
             
     except Error as e:

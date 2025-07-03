@@ -98,7 +98,6 @@ $(document).ready(function() {
             const $button = $(this);
             $button.addClass('loading').prop('disabled', true);
             
-            // 현재 사용자 정보 가져오기
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             
             // 코멘트 저장 API 호출
@@ -108,25 +107,20 @@ $(document).ready(function() {
                 contentType: 'application/json',
                 data: JSON.stringify({
                     content: comment,
-                    userId: currentUser.userId
+                    userId: currentUser.userId,
+                    loginHistoryId: currentUser.loginHistoryId
                 }),
                 success: function(response) {
                     if (response.success) {
                         alert('코멘트가 저장되었습니다.');
                         closeCommentModal();
                     } else {
-                        alert(response.message || '코멘트 저장에 실패했습니다.');
+                        alert(response.message || '코멘트 저장 중 오류가 발생했습니다.');
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('코멘트 저장 오류:', error);
-                    let errorMessage = '코멘트 저장 중 오류가 발생했습니다.';
-                    
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-                    
-                    alert(errorMessage);
+                    console.error('코멘트 저장 실패:', error);
+                    alert('코멘트 저장 중 오류가 발생했습니다.');
                 },
                 complete: function() {
                     $button.removeClass('loading').prop('disabled', false);
