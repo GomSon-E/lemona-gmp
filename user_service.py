@@ -7,99 +7,123 @@ from database import get_db_connection
 
 # ! 사용자 로그인
 async def login_user(request: Request):
-    try:
-        login_data = await request.json()
-        user_id = login_data['userId']
-        password = login_data['password']
-        
-        with get_db_connection() as connection:
-            cursor = connection.cursor(dictionary=True)
-            
-            # 사용자 정보 조회 및 검증
-            query = """
-                SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, u.ROLE_ID, r.ROLE_NAME, u.PW_UPDATE_DT
-                FROM USER u
-                LEFT JOIN ROLE r ON u.ROLE_ID = r.ROLE_ID
-                WHERE u.USER_ID = %s AND u.STATUS = TRUE
-            """
-            cursor.execute(query, (user_id,))
-            user = cursor.fetchone()
-            
-            if not user:
+   try:
+       login_data = await request.json()
+       user_id = login_data['userId']
+       password = login_data['password']
+       
+       with get_db_connection() as connection:
+           cursor = connection.cursor(dictionary=True)
+           
+           # 로그인 기록 쿼리
+           login_history_query = """
+               INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
+               VALUES (%s, %s, %s)
+           """
+           
+           from datetime import datetime
+           current_time = datetime.now()
+           
+           # 사용자 정보 조회 및 검증
+           query = """
+               SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, u.ROLE_ID, r.ROLE_NAME, u.PW_UPDATE_DT
+               FROM USER u
+               LEFT JOIN ROLE r ON u.ROLE_ID = r.ROLE_ID
+               WHERE u.USER_ID = %s
+           """
+           cursor.execute(query, (user_id,))
+           user = cursor.fetchone()
+           
+           if not user:
+               # 존재하지 않는 사용자 - 로그인 실패 기록
+                login_history_query = """
+                    INSERT INTO LOGIN_HISTORY (CONTENT, CREATE_DT)
+                    VALUES (%s, %s)
+                """
+                cursor.execute(login_history_query, (f'Login Failed - User Not Found : {user_id}', current_time))
+                connection.commit()
+               
                 return JSONResponse({
                     "success": False,
-                    "message": "존재하지 않거나 비활성화된 사용자입니다."
+                    "message": "존재하지 않는 사용자입니다."
                 })
-            
-            # 비밀번호 확인
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            if user['PW'] != hashed_password:
-                return JSONResponse({
-                    "success": False,
-                    "message": "비밀번호가 일치하지 않습니다."
-                })
-            
-            # 비밀번호 변경 필요 여부 체크
-            password_change_required = False
-            password_change_reason = ""
-            
-            # ROOT 권한(ROLE_ID = 1)은 비밀번호 변경 강제하지 않음
-            if user['ROLE_ID'] != 1:  # ROOT가 아닌 경우만 체크
-                # 1. 초기 비밀번호 사용 체크
-                if password == '1234!':
-                    password_change_required = True
-                    password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
-                
-                # 2. 90일 경과 체크
-                if user['PW_UPDATE_DT']:
-                    ninety_days_ago = date.today() - timedelta(days=90)
-                    if user['PW_UPDATE_DT'] < ninety_days_ago:
-                        password_change_required = True
-                        password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
-            
-            # 로그인 기록 저장
-            from datetime import datetime
-            current_time = datetime.now()
-            
-            login_history_query = """
-                INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
-                VALUES (%s, %s, %s)
-            """
-            
-            cursor.execute(login_history_query, ('Login Success', user_id, current_time))
-            login_history_id = cursor.lastrowid  # 방금 삽입된 로그인 기록의 ID
-            connection.commit()
-            
-            # 로그인 성공
-            response_data = {
-                "success": True,
-                "message": "로그인 성공",
-                "data": {
-                    "userId": user['USER_ID'],
-                    "name": user['NAME'],
-                    "division": user['DIVISION'],
-                    "roleId": user['ROLE_ID'],
-                    "roleName": user['ROLE_NAME'],
-                    "passwordChangeRequired": password_change_required,
-                    "passwordChangeReason": password_change_reason,
-                    "loginHistoryId": login_history_id
-                }
-            }
+           
+           if not user['STATUS']:
+               # 비활성화된 사용자 - 로그인 실패 기록
+               cursor.execute(login_history_query, ('Login Failed - User Deactivated', user_id, current_time))
+               connection.commit()
+               
+               return JSONResponse({
+                   "success": False,
+                   "message": "비활성화된 사용자입니다."
+               })
+           
+           # 비밀번호 확인
+           hashed_password = hashlib.sha256(password.encode()).hexdigest()
+           if user['PW'] != hashed_password:
+               # 비밀번호 불일치 - 로그인 실패 기록
+               cursor.execute(login_history_query, ('Login Failed - Wrong Password', user_id, current_time))
+               connection.commit()
+               
+               return JSONResponse({
+                   "success": False,
+                   "message": "비밀번호가 일치하지 않습니다."
+               })
+           
+           # 비밀번호 변경 필요 여부 체크
+           password_change_required = False
+           password_change_reason = ""
+           
+           # ROOT 권한(ROLE_ID = 1)은 비밀번호 변경 강제하지 않음
+           if user['ROLE_ID'] != 1:  # ROOT가 아닌 경우만 체크
+               # 1. 초기 비밀번호 사용 체크
+               if password == '1234!':
+                   password_change_required = True
+                   password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
+               
+               # 2. 90일 경과 체크
+               if user['PW_UPDATE_DT']:
+                   from datetime import date, timedelta
+                   ninety_days_ago = date.today() - timedelta(days=90)
+                   if user['PW_UPDATE_DT'] < ninety_days_ago:
+                       password_change_required = True
+                       password_change_reason = "비밀번호 변경 후 90일이 경과했습니다. 보안을 위해 비밀번호를 변경해주세요."
+           
+           # 로그인 성공 기록 저장
+           cursor.execute(login_history_query, ('Login Success', user_id, current_time))
+           login_history_id = cursor.lastrowid  # 방금 삽입된 로그인 기록의 ID
+           connection.commit()
+           
+           # 로그인 성공
+           response_data = {
+               "success": True,
+               "message": "로그인 성공",
+               "data": {
+                   "userId": user['USER_ID'],
+                   "name": user['NAME'],
+                   "division": user['DIVISION'],
+                   "roleId": user['ROLE_ID'],
+                   "roleName": user['ROLE_NAME'],
+                   "passwordChangeRequired": password_change_required,
+                   "passwordChangeReason": password_change_reason,
+                   "loginHistoryId": login_history_id
+               }
+           }
 
-            return JSONResponse(response_data)
-            
-    except Error as e:
-        print(f"로그인 오류: {e}")
-        return JSONResponse({
-            "success": False,
-            "message": "로그인 처리 중 오류가 발생했습니다."
-        })
-    except Exception as e:
-        print(f"예상치 못한 오류: {e}")
-        return JSONResponse({
-            "success": False,
-            "message": "서버 내부 오류가 발생했습니다."
-        })
+           return JSONResponse(response_data)
+           
+   except Error as e:
+       print(f"로그인 오류: {e}")
+       return JSONResponse({
+           "success": False,
+           "message": "로그인 처리 중 오류가 발생했습니다."
+       })
+   except Exception as e:
+       print(f"예상치 못한 오류: {e}")
+       return JSONResponse({
+           "success": False,
+           "message": "서버 내부 오류가 발생했습니다."
+       })
 
 # ! 사용자 로그아웃
 async def logout_user(request: Request):
