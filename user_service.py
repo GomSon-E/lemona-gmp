@@ -101,6 +101,45 @@ async def login_user(request: Request):
             "message": "서버 내부 오류가 발생했습니다."
         })
 
+# ! 사용자 로그아웃
+async def logout_user(request: Request):
+    try:
+        logout_data = await request.json()
+        user_id = logout_data['userId']
+        
+        with get_db_connection() as connection:
+            cursor = connection.cursor()
+            
+            # 로그아웃 기록 저장
+            from datetime import datetime
+            current_time = datetime.now()
+            
+            logout_history_query = """
+                INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
+                VALUES (%s, %s, %s)
+            """
+            
+            cursor.execute(logout_history_query, ('Logout', user_id, current_time))
+            connection.commit()
+            
+            return JSONResponse({
+                "success": True,
+                "message": "로그아웃이 성공적으로 처리되었습니다."
+            })
+            
+    except Error as e:
+        print(f"로그아웃 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "로그아웃 처리 중 오류가 발생했습니다."
+        })
+    except Exception as e:
+        print(f"예상치 못한 오류: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": "서버 내부 오류가 발생했습니다."
+        })
+
 # ! 사용자 생성
 async def create_user(request: Request):
     try:

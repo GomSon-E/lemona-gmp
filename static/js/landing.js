@@ -376,16 +376,35 @@ $(document).ready(function() {
     // ! 로그아웃 처리
     function logout() {
         if (confirm('로그아웃 하시겠습니까?')) {
-            // 로컬 스토리지 정리
-            localStorage.removeItem('currentUser');
+            // 로그아웃 API 호출
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             
-            // 현재 페이지 정리
-            if (window.currentPageCleanup) {
-                window.currentPageCleanup();
-            }
-            
-            // 로그인 페이지로 이동
-            window.location.href = '/login';
+            $.ajax({
+                url: '/api/logout',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userId: currentUser.userId
+                }),
+                success: function(response) {
+                    console.log('로그아웃 기록 저장 성공');
+                },
+                error: function(xhr, status, error) {
+                    console.error('로그아웃 기록 저장 실패:', error);
+                },
+                complete: function() {
+                    // 로컬 스토리지 정리
+                    localStorage.removeItem('currentUser');
+
+                    // 현재 페이지 정리
+                    if (window.currentPageCleanup) {
+                        window.currentPageCleanup();
+                    }
+                    
+                    // 로그인 페이지로 이동
+                    window.location.href = '/login';
+                }
+            });
         }
     }
 

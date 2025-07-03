@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from user_service import login_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
+from user_service import login_user, logout_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
 from audit_service import create_comment
 
@@ -25,6 +25,10 @@ async def login_page():
 @app.post("/api/login")
 async def login_api(request: Request):
     return await login_user(request)
+
+@app.post("/api/logout")
+async def logout_api(request: Request):
+    return await logout_user(request)
 
 @app.get("/api/users")
 async def get_all_users_api():
