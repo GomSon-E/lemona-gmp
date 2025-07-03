@@ -98,11 +98,40 @@ $(document).ready(function() {
             const $button = $(this);
             $button.addClass('loading').prop('disabled', true);
             
-            // 실제 저장 로직 구현 예정
-            setTimeout(() => {
-                alert('코멘트가 저장되었습니다.');
-                closeCommentModal();
-            }, 1000);
+            // 현재 사용자 정보 가져오기
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // 코멘트 저장 API 호출
+            $.ajax({
+                url: '/api/comments',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    content: comment,
+                    userId: currentUser.userId
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        alert('코멘트가 저장되었습니다.');
+                        closeCommentModal();
+                    } else {
+                        alert(response.message || '코멘트 저장에 실패했습니다.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('코멘트 저장 오류:', error);
+                    let errorMessage = '코멘트 저장 중 오류가 발생했습니다.';
+                    
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    
+                    alert(errorMessage);
+                },
+                complete: function() {
+                    $button.removeClass('loading').prop('disabled', false);
+                }
+            });
         });
 
         // 취소 버튼 클릭

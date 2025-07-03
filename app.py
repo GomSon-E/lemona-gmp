@@ -5,6 +5,7 @@ import uvicorn
 
 from user_service import login_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
+from audit_service import create_comment
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -60,6 +61,10 @@ async def get_access_api(role_id: str):
 @app.put("/api/access")
 async def update_access_api(request: Request):
     return await update_access(request)
-    
+
+@app.post("/api/comments")
+async def create_comment_api(request: Request):
+    return await create_comment(request)
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
