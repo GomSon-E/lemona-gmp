@@ -2,6 +2,9 @@ $(document).ready(function() {
     // 초기화
     if (!checkUserLogin()) return;
 
+    // 자동 로그아웃 초기화
+    initAutoLogout();
+
     // 비밀번호 변경 강제 체크
     checkForcePasswordChange();
     
@@ -376,6 +379,11 @@ $(document).ready(function() {
     // ! 로그아웃 처리
     function logout() {
         if (confirm('로그아웃 하시겠습니까?')) {
+            // 자동 로그아웃 타이머 정리
+            if (window.autoLogoutCleanup) {
+                window.autoLogoutCleanup();
+            }
+            
             // 로그아웃 API 호출
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             
@@ -384,7 +392,8 @@ $(document).ready(function() {
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    userId: currentUser.userId
+                    userId: currentUser.userId,
+                    logoutType: 'manual' // 수동 로그아웃 표시
                 }),
                 success: function(response) {
                     console.log('로그아웃 기록 저장 성공');
@@ -408,6 +417,73 @@ $(document).ready(function() {
         }
     }
 
+    // ! 자동 로그아웃
+    function initAutoLogout() {
+        const AUTO_LOGOUT_TIME = 5 * 60 * 1000; // 5분 (밀리초)
+        
+        let autoLogoutTimer = null;
+
+        // 타이머 리셋 함수 (메뉴 클릭 시에만 호출)
+        function resetAutoLogoutTimer() {
+            // 기존 타이머 클리어
+            if (autoLogoutTimer) {
+                clearTimeout(autoLogoutTimer);
+            }
+            
+            // 자동 로그아웃 타이머 설정 (5분 후)
+            autoLogoutTimer = setTimeout(() => {
+                performAutoLogout();
+            }, AUTO_LOGOUT_TIME);
+        }
+
+        // 자동 로그아웃 수행
+        function performAutoLogout() {
+            // 로그아웃 처리
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            $.ajax({
+                url: '/api/logout',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userId: currentUser.userId,
+                    logoutType: 'auto' // 자동 로그아웃 표시
+                }),
+                success: function(response) {
+                    console.log('자동 로그아웃 기록 저장 성공');
+                },
+                error: function(xhr, status, error) {
+                    console.error('자동 로그아웃 기록 저장 실패:', error);
+                },
+                complete: function() {
+                    // 로컬 스토리지 정리
+                    localStorage.removeItem('currentUser');
+
+                    // 현재 페이지 정리
+                    if (window.currentPageCleanup) {
+                        window.currentPageCleanup();
+                    }
+                    
+                    // 로그인 페이지로 이동
+                    window.location.href = '/login';
+                }
+            });
+        }
+
+        // 로그인 시 타이머 시작
+        resetAutoLogoutTimer();
+
+        // 전역 함수로 등록 (메뉴 클릭 시에만 사용)
+        window.resetAutoLogoutTimer = resetAutoLogoutTimer;
+        
+        // 정리 함수 등록
+        window.autoLogoutCleanup = function() {
+            if (autoLogoutTimer) {
+                clearTimeout(autoLogoutTimer);
+            }
+        };
+    }
+
     function handlePageNavigation(page) {
         try {
             loadPage(page);
@@ -423,6 +499,11 @@ $(document).ready(function() {
         // 기존 페이지 정리
         if (window.currentPageCleanup) {
             window.currentPageCleanup();
+        }
+
+        // loadPage 호출 시 자동 로그아웃 타이머 리셋
+        if (window.resetAutoLogoutTimer) {
+            window.resetAutoLogoutTimer();
         }
         
         // CSS 로드

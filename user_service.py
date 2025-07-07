@@ -183,6 +183,7 @@ async def logout_user(request: Request):
     try:
         logout_data = await request.json()
         user_id = logout_data['userId']
+        logout_type = logout_data.get('logoutType', 'manual')  # manual 또는 auto
         
         with get_db_connection() as connection:
             cursor = connection.cursor()
@@ -191,12 +192,18 @@ async def logout_user(request: Request):
             from datetime import datetime
             current_time = datetime.now()
             
+            # 로그아웃 타입에 따른 메시지 설정
+            if logout_type == 'auto':
+                content = 'Logout - Auto Logout'
+            else:
+                content = 'Logout - Manual Logout'
+            
             logout_history_query = """
                 INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
                 VALUES (%s, %s, %s)
             """
             
-            cursor.execute(logout_history_query, ('Logout', user_id, current_time))
+            cursor.execute(logout_history_query, (content, user_id, current_time))
             connection.commit()
             
             return JSONResponse({
