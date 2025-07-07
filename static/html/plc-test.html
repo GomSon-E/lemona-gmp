@@ -1,0 +1,40 @@
+<div class="plc-test-container">
+    <h1 class="page-title">PLC 통신 테스트</h1>
+    
+    <div class="plc-info-section">
+        <h3 class="section-title">PLC 연결 정보</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>IP 주소:</label>
+                <span>192.168.1.1</span>
+            </div>
+            <div class="info-item">
+                <label>포트:</label>
+                <span>8500</span>
+            </div>
+            <div class="info-item">
+                <label>읽기 주소:</label>
+                <span>6000번</span>
+            </div>
+            <div class="info-item">
+                <label>신호 주소:</label>
+                <span>6008번</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="plc-control-section">
+        <h3 class="section-title">PLC 제어</h3>
+        <div class="control-buttons">
+            <button type="button" class="btn btn-primary" id="readDataBtn">데이터 읽기</button>
+            <button type="button" class="btn btn-secondary" id="checkStatusBtn">연결 상태 확인</button>
+        </div>
+    </div>
+
+    <div class="plc-result-section">
+        <h3 class="section-title">결과</h3>
+        <div class="result-container" id="resultContainer">
+            <div class="no-result-message">버튼을 클릭하여 PLC 통신을 테스트하세요.</div>
+        </div>
+    </div>
+</div>
