@@ -83,7 +83,6 @@ async def login_user(request: Request):
                     password_change_reason = "초기 비밀번호를 사용 중입니다. 보안을 위해 비밀번호를 변경해주세요."
                 
                 if user['PW_UPDATE_DT']:
-                    from datetime import date, timedelta
                     ninety_days_ago = date.today() - timedelta(days=90)
                     if user['PW_UPDATE_DT'] < ninety_days_ago:
                         password_change_required = True
@@ -103,7 +102,9 @@ async def login_user(request: Request):
                     "roleName": user['ROLE_NAME'],
                     "passwordChangeRequired": password_change_required,
                     "passwordChangeReason": password_change_reason,
-                    "loginHistoryId": login_history_id
+                    "loginHistoryId": login_history_id,
+                    "loginTime": current_time.isoformat(),
+                    "expiresAt": (current_time + timedelta(minutes=5)).isoformat()
                 }
             }
 
@@ -194,7 +195,9 @@ async def logout_user(request: Request):
             
             # 로그아웃 타입에 따른 메시지 설정
             if logout_type == 'auto':
-                content = 'Logout - Auto Logout'
+                content = 'Logout - Auto Logout (5min inactivity)'
+            elif logout_type == 'session_expired':
+                content = 'Logout - Session Expired (5min)'
             else:
                 content = 'Logout - Manual Logout'
             
