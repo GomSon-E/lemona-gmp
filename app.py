@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi import UploadFile, File
 import uvicorn
 
 from user_service import login_user, logout_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
 from audit_service import create_comment
 from plc_service import read_plc_data, check_plc_status
+from backup_service import create_backup, restore_backup
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -78,6 +80,14 @@ async def read_plc_data_api():
 @app.get("/api/plc/status")
 async def check_plc_status_api():
     return await check_plc_status()
+
+@app.post("/api/backup/create")
+async def create_backup_api():
+    return await create_backup()
+
+@app.post("/api/backup/restore")
+async def restore_backup_api(backup_file: UploadFile = File(...)):
+    return await restore_backup(backup_file)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
