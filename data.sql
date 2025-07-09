@@ -160,10 +160,8 @@ INSERT INTO ROLE (ROLE_NAME) VALUES
 
 INSERT INTO PAGE (PAGE_LINK, MENU_NAME, PAGE_NAME) VALUES
 ('equipment-history', '이력 조회', '설비 가동 이력 조회'),
-('value-history', '이력 조회', '공정 값 변경 이력 조회'),
 ('alarm-history', '이력 조회', '설비 알람 이력 조회'),
-('user-operation', '이력 조회', '사용자 조작 이력 조회'),
-('report-history', '이력 조회', '보고서 이력 조회'),
+('report-history', '이력 조회', '보고서 생성 이력 조회'),
 ('login-history', '이력 조회', '접속 이력 조회'),
 ('user-history', '이력 조회', '사용자 관리 이력 조회'),
 ('data-history', '이력 조회', '데이터 관리 이력 조회'),
@@ -172,12 +170,16 @@ INSERT INTO PAGE (PAGE_LINK, MENU_NAME, PAGE_NAME) VALUES
 ('access-update', '사용자 관리', '권한별 접근 가능 페이지 관리'),
 ('password-change', '사용자 관리', '비밀번호 변경'),
 ('audit-trail', '감사 추적', 'Audit Trail'),
-('backup-restore', '데이터 관리', '데이터 백업/복원');
+('backup-restore', '데이터 관리', '데이터 백업/복원'),
+('plc-test', 'PLC 테스트', 'PLC 통신 테스트');
 
 INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('1', '9'),
+('1', '13'),
 ('2', '1'),
+('2', '2'),
 ('2', '3'),
+('2', '4'),
 ('2', '5'),
 ('2', '6'),
 ('2', '7'),
@@ -186,26 +188,77 @@ INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('2', '10'),
 ('2', '11'),
 ('2', '12'),
-('2', '13'),
-('2', '14'),
 ('3', '1'),
+('3', '2'),
 ('3', '3'),
+('3', '4'),
 ('3', '5'),
 ('3', '6'),
-('3', '7'),
-('3', '8'),
+('3', '11'),
 ('3', '12'),
-('3', '13'),
 ('4', '1'),
+('4', '2'),
 ('4', '3'),
+('4', '4'),
 ('4', '5'),
 ('4', '6'),
-('4', '7'),
-('4', '8'),
-('4', '12'),
-('4', '13');
+('4', '11'),
+('4', '12');
 
-SELECT * FROM ROLE;
-SELECT * FROM PAGE;
-SELECT * FROM ACCESS;
-SELECT * FROM USER;
+-- ROOT 사용자 생성 (ROLE_ID: 1)
+INSERT INTO USER (USER_ID, PW, NAME, DIVISION, STATUS, ROLE_ID, PW_UPDATE_DT, CREATE_DT, UPDATE_DT)
+VALUES (
+    'root', 
+    '6cbefd8960d511540f34779628ef4e5a55b758d3be5749cd8878a09b348c052b',
+    '시스템 관리자', 
+    'IT부서', 
+    TRUE, 
+    1, 
+    NULL,
+    CURDATE(), 
+    CURDATE()
+);
+
+-- ADMIN 사용자 생성 (ROLE_ID: 2) 
+INSERT INTO USER (USER_ID, PW, NAME, DIVISION, STATUS, ROLE_ID, PW_UPDATE_DT, CREATE_DT, UPDATE_DT)
+VALUES (
+    'admin01', 
+    '6cbefd8960d511540f34779628ef4e5a55b758d3be5749cd8878a09b348c052b',
+    '관리자', 
+    '관리부', 
+    TRUE, 
+    2, 
+    NULL,
+    CURDATE(), 
+    CURDATE()
+);
+
+-- MANAGER 사용자 생성 (ROLE_ID: 3)
+INSERT INTO USER (USER_ID, PW, NAME, DIVISION, STATUS, ROLE_ID, PW_UPDATE_DT, CREATE_DT, UPDATE_DT)
+VALUES (
+    'manager01', 
+    '6cbefd8960d511540f34779628ef4e5a55b758d3be5749cd8878a09b348c052b',
+    '매니저', 
+    '생산부', 
+    TRUE, 
+    3, 
+    NULL,
+    CURDATE(), 
+    CURDATE()
+);
+
+-- USER 사용자 생성 (ROLE_ID: 4)
+INSERT INTO USER (USER_ID, PW, NAME, DIVISION, STATUS, ROLE_ID, PW_UPDATE_DT, CREATE_DT, UPDATE_DT)
+VALUES (
+    'user01', 
+    '6cbefd8960d511540f34779628ef4e5a55b758d3be5749cd8878a09b348c052b',
+    '일반사용자', 
+    '품질관리부', 
+    TRUE, 
+    4, 
+    NULL,
+    CURDATE(), 
+    CURDATE()
+);
+
+select * from user;
