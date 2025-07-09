@@ -331,14 +331,66 @@ class HistoryBasePage {
     exportReport() {
         const filters = this.getFilters();
         
+        // 현재 사용자 정보 추가
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        filters.currentUserId = currentUser.userId || 'unknown';
+        filters.loginHistoryId = currentUser.loginHistoryId || null;  // 로그인 히스토리 ID 추가
+        
+        // 로딩 상태 표시
+        const $button = $('#exportBtn');
+        const originalText = $button.text();
+        $button.text('생성 중...').prop('disabled', true);
+        
         // 보고서 추출 API 호출
         const params = new URLSearchParams(filters);
         const url = `${this.config.apiEndpoint}/export?${params}`;
         
-        // 파일 다운로드
-        window.open(url, '_blank');
+        // Fetch API로 PDF 다운로드
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('보고서 생성에 실패했습니다.');
+                }
+                
+                // 응답 헤더에서 파일명 추출
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `${this.config.pageTitle}_보고서.pdf`; // 기본 파일명
+                
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+                    if (filenameMatch) {
+                        filename = decodeURIComponent(filenameMatch[1]);
+                    }
+                }
+                
+                return response.blob().then(blob => ({ blob, filename }));
+            })
+            .then(({ blob, filename }) => {
+                // PDF 파일 다운로드
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = filename;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // URL 객체 해제
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                console.log('보고서 다운로드 완료:', filename);
+            })
+            .catch(error => {
+                console.error('보고서 생성 실패:', error);
+                alert('보고서 생성 중 오류가 발생했습니다.');
+            })
+            .finally(() => {
+                // 버튼 상태 복원
+                $button.text(originalText).prop('disabled', false);
+            });
     }
-    
+        
     // 유틸리티 메서드들
     formatDate(date) {
         if (!date) return '';
