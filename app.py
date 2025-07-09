@@ -6,7 +6,7 @@ import uvicorn
 
 from user_service import login_user, logout_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
-from audit_service import create_comment
+from audit_service import create_comment, get_audit_trail, export_audit_trail
 from plc_service import read_plc_data, check_plc_status
 from backup_service import create_backup, restore_backup
 from history_service import (
@@ -144,6 +144,14 @@ async def get_data_history_api(request: Request):
 @app.get("/api/data-history/export")
 async def export_data_history_api(request: Request):
     return await export_data_history(request)
+
+@app.get("/api/audit-trail")
+async def get_audit_trail_api(request: Request):
+    return await get_audit_trail(request)
+
+@app.get("/api/audit-trail/export")
+async def export_audit_trail_api(request: Request):
+    return await export_audit_trail(request)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

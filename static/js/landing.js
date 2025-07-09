@@ -592,8 +592,7 @@ $(document).ready(function() {
         // 조회 페이지들은 공통 템플릿과 CSS 사용
         const historyPages = [
             'equipment-history', 'alarm-history', 'report-history',
-            'login-history', 'user-history', 'data-history',
-            'value-history', 'user-operation'
+            'login-history', 'user-history', 'data-history', 'audit-trail'
         ];
         
         if (historyPages.includes(pageName)) {
