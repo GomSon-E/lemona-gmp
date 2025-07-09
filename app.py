@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import UploadFile, File
 import uvicorn
+from contextlib import asynccontextmanager
 
 from user_service import login_user, logout_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
@@ -18,7 +19,21 @@ from history_service import (
     get_data_history, export_data_history
 )
 
-app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        print("애플리케이션 시작 - 초기 백업 생성 중...")
+        backup_response = await create_backup()
+        print("초기 백업 생성 완료")
+    except Exception as e:
+        print(f"초기 백업 생성 실패: {e}")
+    
+    yield
+
+app = FastAPI(
+    title="얼굴 특징 벡터 추출 및 비교 API",
+    lifespan=lifespan
+)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
