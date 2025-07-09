@@ -1,0 +1,73 @@
+<div class="history-container">
+    <h1 class="page-title" id="pageTitle">조회 페이지</h1>
+    
+    <!-- 검색 조건 섹션 -->
+    <div class="search-filter-section">
+        <h3 class="section-title">검색 조건</h3>
+        <div class="filter-controls">
+            <!-- 기간 검색 -->
+            <div class="filter-group">
+                <label class="filter-label" id="periodLabel">기간</label>
+                <div class="date-range">
+                    <input type="date" class="filter-input" id="startDate">
+                    <span class="date-separator">~</span>
+                    <input type="date" class="filter-input" id="endDate">
+                </div>
+            </div>
+            
+            <!-- 사용자 검색 -->
+            <div class="filter-group">
+                <label class="filter-label" for="filterUserId">사용자 ID</label>
+                <input type="text" class="filter-input" id="filterUserId" placeholder="사용자 ID 검색">
+            </div>
+            
+            <!-- 작업내용 검색 -->
+            <div class="filter-group">
+                <label class="filter-label" for="filterContent">작업내용</label>
+                <input type="text" class="filter-input" id="filterContent" placeholder="작업내용 검색">
+            </div>
+            
+            <!-- 코멘트 검색 -->
+            <div class="filter-group">
+                <label class="filter-label" for="filterComment">코멘트</label>
+                <input type="text" class="filter-input" id="filterComment" placeholder="코멘트 검색">
+            </div>
+            
+            <!-- 버튼 그룹 -->
+            <div class="filter-actions">
+                <button type="button" class="btn btn-search" id="searchBtn">검색</button>
+                <button type="button" class="btn btn-reset" id="resetBtn">초기화</button>
+                <button type="button" class="btn btn-export" id="exportBtn">보고서 추출</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 데이터 테이블 섹션 -->
+    <div class="data-table-section">
+        <div class="table-header">
+            <h3 class="section-title">조회 결과</h3>
+            <div class="table-info">
+                <span class="record-count">총 <span id="recordCount">0</span>건</span>
+                <div class="auto-refresh">
+                    <label>
+                        <input type="checkbox" id="autoRefresh" checked>
+                        자동 새로고침 (5초)
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="data-table" id="dataTable">
+                <thead id="tableHeader">
+                    <!-- 동적으로 생성 -->
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="100%" class="loading-message">데이터를 불러오는 중...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

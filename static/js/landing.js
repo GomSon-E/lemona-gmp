@@ -579,49 +579,84 @@ $(document).ready(function() {
 
    // ! 페이지 로딩
    function loadPage(pageName) {
-       // 기존 페이지 정리
-       if (window.currentPageCleanup) {
-           window.currentPageCleanup();
-       }
+        // 기존 페이지 정리
+        if (window.currentPageCleanup) {
+            window.currentPageCleanup();
+        }
 
-       // loadPage 호출 시 자동 로그아웃 타이머 리셋 (세션 만료 시간도 함께 리셋됨)
-       if (window.resetAutoLogoutTimer) {
-           window.resetAutoLogoutTimer();
-       }
-       
-       // CSS 로드
-       if (!$(`link[href*="${pageName}.css"]`).length) {
-           $('head').append(`<link rel="stylesheet" href="static/css/${pageName}.css">`);
-       }
-       
-       // HTML 로드
-       $.get(`static/html/${pageName}.html`)
-           .done(function(data) {
-               $('.dashboard-container').html(data);
-               
-               // JS 로드 및 초기화
-               $.getScript(`static/js/${pageName}.js`)
-                   .done(function() {
-                       const functionName = convertToFunctionName(pageName, 'init');
-                       if (typeof window[functionName] === 'function') {
-                           window[functionName]();
-                       }
-                   })
-                   .fail(function(jqxhr, textStatus, error) {
-                       console.error(`${pageName}.js 로드 실패:`, textStatus, error);
-                   });
-           })
-           .fail(function() {
-               $('.dashboard-container').html('<div class="error-message">페이지를 불러올 수 없습니다.</div>');
-           });
-   }
+        // loadPage 호출 시 자동 로그아웃 타이머 리셋
+        if (window.resetAutoLogoutTimer) {
+            window.resetAutoLogoutTimer();
+        }
+        
+        // 조회 페이지들은 공통 템플릿과 CSS 사용
+        const historyPages = [
+            'equipment-history', 'alarm-history', 'report-history',
+            'login-history', 'user-history', 'data-history',
+            'value-history', 'user-operation'
+        ];
+        
+        if (historyPages.includes(pageName)) {
+            // 공통 CSS 로드
+            if (!$(`link[href*="history-base.css"]`).length) {
+                $('head').append(`<link rel="stylesheet" href="static/css/history-base.css">`);
+            }
+            
+            // 공통 HTML 템플릿 로드
+            $.get(`static/html/history-base.html`)
+                .done(function(data) {
+                    $('.dashboard-container').html(data);
+                    
+                    // 공통 JS와 개별 JS 로드
+                    Promise.all([
+                        $.getScript(`static/js/history-base.js`),
+                        $.getScript(`static/js/${pageName}.js`)
+                    ]).then(() => {
+                        const functionName = convertToFunctionName(pageName, 'init');
+                        if (typeof window[functionName] === 'function') {
+                            window[functionName]();
+                        }
+                    }).catch((error) => {
+                        console.error(`${pageName} 스크립트 로드 실패:`, error);
+                        $('.dashboard-container').html('<div class="error-message">페이지를 불러올 수 없습니다.</div>');
+                    });
+                })
+                .fail(function() {
+                    $('.dashboard-container').html('<div class="error-message">공통 템플릿을 불러올 수 없습니다.</div>');
+                });
+        } else {
+            // 기존 방식으로 개별 페이지 로드 (사용자 관리 등)
+            if (!$(`link[href*="${pageName}.css"]`).length) {
+                $('head').append(`<link rel="stylesheet" href="static/css/${pageName}.css">`);
+            }
+            
+            $.get(`static/html/${pageName}.html`)
+                .done(function(data) {
+                    $('.dashboard-container').html(data);
+                    
+                    $.getScript(`static/js/${pageName}.js`)
+                        .done(function() {
+                            const functionName = convertToFunctionName(pageName, 'init');
+                            if (typeof window[functionName] === 'function') {
+                                window[functionName]();
+                            }
+                        })
+                        .fail(function(jqxhr, textStatus, error) {
+                            console.error(`${pageName}.js 로드 실패:`, textStatus, error);
+                        });
+                })
+                .fail(function() {
+                    $('.dashboard-container').html('<div class="error-message">페이지를 불러올 수 없습니다.</div>');
+                });
+        }
+    }
 
-   function convertToFunctionName(pageName, prefix) {
-       const words = pageName.split('-');
-       const camelCase = words.map(word => 
-           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-       ).join('');
-       return `${prefix}${camelCase}Page`;
-   }
+    function convertToFunctionName(pageName, prefix) {
+        const words = pageName.split('-');
+        const camelCase = words.map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join('');
+        return `${prefix}${camelCase}Page`;
+    }
 
 });
