@@ -222,7 +222,7 @@ class AuditTrailService:
                 pdf_buffer = self.generate_pdf_report(data, params)
                 
                 current_time = datetime.now()
-                report_content = f"{self.report_title} 보고서 생성"
+                report_content = f"Report Generated - {self.report_title}"
                 
                 # REPORT_HISTORY에 기록 저장
                 report_history_query = """
