@@ -23,7 +23,7 @@ from history_service import (
 async def lifespan(app: FastAPI):
     try:
         print("애플리케이션 시작 - 초기 백업 생성 중...")
-        backup_response = await create_backup()
+        backup_response = await create_backup(None, is_manual=False)
         print("초기 백업 생성 완료")
     except Exception as e:
         print(f"초기 백업 생성 실패: {e}")
@@ -105,12 +105,12 @@ async def check_plc_status_api():
     return await check_plc_status()
 
 @app.post("/api/backup/create")
-async def create_backup_api():
-    return await create_backup()
+async def create_backup_api(request: Request):
+    return await create_backup(request, is_manual=True)
 
 @app.post("/api/backup/restore")
-async def restore_backup_api(backup_file: UploadFile = File(...)):
-    return await restore_backup(backup_file)
+async def restore_backup_api(request: Request, backup_file: UploadFile = File(...)):
+    return await restore_backup(request, backup_file)
 
 @app.get("/api/equipment-history")
 async def get_equipment_history_api(request: Request):

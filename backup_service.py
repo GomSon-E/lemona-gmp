@@ -5,6 +5,8 @@ import os
 from datetime import datetime
 import tempfile
 
+from database import get_db_connection
+
 # 백업 설정
 BACKUP_DIR = "./backup"
 MYSQL_CONFIG = {
@@ -125,12 +127,25 @@ def get_mysql_command_without_db():
         '--default-character-set=utf8mb4'
     ]
 
-# ! 백업 생성 (구조 + 데이터)
-async def create_backup():
+# ! 데이터 백업
+async def create_backup(request, is_manual: bool = True):
     try:
         # 백업 파일명 생성
         backup_filename = "backup.bak"
         backup_path = os.path.join(BACKUP_DIR, backup_filename)
+        
+        backup_type = "Auto"
+        current_user_id = None
+        login_history_id = None
+        
+        if is_manual:
+            backup_type = "Manual"
+            params = dict(request.query_params)
+            current_user_id = params.get('currentUserId')
+            login_history_id = params.get('loginHistoryId')
+        
+        # 백업 파일 생성 전에 로그 저장
+        await save_data_history_log(f"Data Backup - {backup_type} ", current_user_id, login_history_id)
         
         # 구조 + 데이터 백업을 위한 mysqldump 명령
         try:
@@ -160,7 +175,7 @@ async def create_backup():
             
             return JSONResponse({
                 "success": True,
-                "message": "데이터베이스 백업이 성공적으로 생성되었습니다. (구조 + 데이터 + 권한 포함)",
+                "message": "데이터베이스 백업이 성공적으로 생성되었습니다.",
                 "data": {
                     "filename": backup_filename,
                     "path": backup_path,
@@ -187,8 +202,12 @@ async def create_backup():
         })
 
 # ! 데이터 복원
-async def restore_backup(backup_file: UploadFile = File(...)):
+async def restore_backup(request, backup_file: UploadFile):
     try:
+        params = dict(request.query_params)
+        current_user_id = params.get('currentUserId', 'system')
+        login_history_id = params.get('loginHistoryId')
+
         # 파일 확장자 확인
         if not backup_file.filename.endswith('.bak'):
             return JSONResponse({
@@ -236,6 +255,8 @@ async def restore_backup(backup_file: UploadFile = File(...)):
                     "message": f"데이터 복원 실패: {result.stderr}"
                 })
             
+            await save_data_history_log(f"Data Restore - File: {backup_file.filename}", current_user_id, login_history_id)
+            
             return JSONResponse({
                 "success": True,
                 "message": "데이터베이스가 성공적으로 복원되었습니다.",
@@ -261,3 +282,37 @@ async def restore_backup(backup_file: UploadFile = File(...)):
             "success": False,
             "message": f"데이터 복원 중 오류가 발생했습니다: {str(e)}"
         })
+
+# Data History 로그 저장 함수
+async def save_data_history_log(content: str, user_id: str, login_history_id: str = None):
+    try: 
+        with get_db_connection() as connection:
+            cursor = connection.cursor(dictionary=True)
+            
+            # 로그인 히스토리에서 코멘트 ID 조회
+            comment_id = None
+            if login_history_id:
+                comment_query = """
+                    SELECT COMMENT_ID 
+                    FROM LOGIN_HISTORY 
+                    WHERE ID = %s
+                """
+                cursor.execute(comment_query, (login_history_id,))
+                comment_result = cursor.fetchone()
+                if comment_result and comment_result['COMMENT_ID']:
+                    comment_id = comment_result['COMMENT_ID']
+            
+            current_time = datetime.now()
+            
+            insert_query = """
+                INSERT INTO DATA_HISTORY (CONTENT, USER_ID, COMMENT_ID, CREATE_DT)
+                VALUES (%s, %s, %s, %s)
+            """
+            
+            cursor.execute(insert_query, (content, user_id, comment_id, current_time))
+            connection.commit()
+            
+            print(f"Data History 로그 저장 완료: {content} by {user_id}, comment_id: {comment_id}")
+            
+    except Exception as e:
+        print(f"Data History 로그 저장 실패: {e}")

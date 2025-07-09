@@ -42,8 +42,15 @@ function initBackupRestorePage() {
         
         $button.addClass('loading').prop('disabled', true);
         
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        
+        const params = new URLSearchParams({
+            currentUserId: currentUser.userId || 'system',
+            loginHistoryId: currentUser.loginHistoryId || ''
+        });
+        
         $.ajax({
-            url: '/api/backup/create',
+            url: `/api/backup/create?${params}`,
             method: 'POST',
             success: function(response) {
                 displayBackupResult(response, '백업 생성 결과');
@@ -129,11 +136,18 @@ function initBackupRestorePage() {
         const $button = $('#restoreDataBtn');
         $button.addClass('loading').prop('disabled', true);
         
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        
+        const params = new URLSearchParams({
+            currentUserId: currentUser.userId || 'system',
+            loginHistoryId: currentUser.loginHistoryId || ''
+        });
+        
         const formData = new FormData();
         formData.append('backup_file', window.selectedBackupFile);
         
         $.ajax({
-            url: '/api/backup/restore',
+            url: `/api/backup/restore?${params}`,
             method: 'POST',
             data: formData,
             processData: false,
