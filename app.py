@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="얼굴 특징 벡터 추출 및 비교 API",
+    title="보틀포장 1호기 데이터 & 권한 관리 S/W API",
     lifespan=lifespan
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
