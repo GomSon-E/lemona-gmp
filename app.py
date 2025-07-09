@@ -9,6 +9,14 @@ from access_service import get_access, get_all_pages, update_access
 from audit_service import create_comment
 from plc_service import read_plc_data, check_plc_status
 from backup_service import create_backup, restore_backup
+from history_service import (
+    get_equipment_history, export_equipment_history,
+    get_alarm_history, export_alarm_history,
+    get_report_history, export_report_history,
+    get_login_history, export_login_history,
+    get_user_history, export_user_history,
+    get_data_history, export_data_history
+)
 
 app = FastAPI(title="얼굴 특징 벡터 추출 및 비교 API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -88,6 +96,54 @@ async def create_backup_api():
 @app.post("/api/backup/restore")
 async def restore_backup_api(backup_file: UploadFile = File(...)):
     return await restore_backup(backup_file)
+
+@app.get("/api/equipment-history")
+async def get_equipment_history_api(request: Request):
+    return await get_equipment_history(request)
+
+@app.get("/api/equipment-history/export")
+async def export_equipment_history_api(request: Request):
+    return await export_equipment_history(request)
+
+@app.get("/api/alarm-history")
+async def get_alarm_history_api(request: Request):
+    return await get_alarm_history(request)
+
+@app.get("/api/alarm-history/export")
+async def export_alarm_history_api(request: Request):
+    return await export_alarm_history(request)
+
+@app.get("/api/report-history")
+async def get_report_history_api(request: Request):
+    return await get_report_history(request)
+
+@app.get("/api/report-history/export")
+async def export_report_history_api(request: Request):
+    return await export_report_history(request)
+
+@app.get("/api/login-history")
+async def get_login_history_api(request: Request):
+    return await get_login_history(request)
+
+@app.get("/api/login-history/export")
+async def export_login_history_api(request: Request):
+    return await export_login_history(request)
+
+@app.get("/api/user-history")
+async def get_user_history_api(request: Request):
+    return await get_user_history(request)
+
+@app.get("/api/user-history/export")
+async def export_user_history_api(request: Request):
+    return await export_user_history(request)
+
+@app.get("/api/data-history")
+async def get_data_history_api(request: Request):
+    return await get_data_history(request)
+
+@app.get("/api/data-history/export")
+async def export_data_history_api(request: Request):
+    return await export_data_history(request)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -410,3 +410,48 @@ class HistoryService:
                 table_data.append([create_dt, user_id, content])
         
         return table_data
+
+# 각 히스토리 테이블별 서비스 인스턴스 생성
+equipment_history_service = HistoryService('EQUIPMENT_HISTORY', True, '설비 가동 이력')
+alarm_history_service = HistoryService('ALARM_HISTORY', True, '설비 알람 이력')
+report_history_service = HistoryService('REPORT_HISTORY', True, '보고서 생성 이력')
+login_history_service = HistoryService('LOGIN_HISTORY', True, '접속 이력')
+user_history_service = HistoryService('USER_HISTORY', True, '사용자 관리 이력')
+data_history_service = HistoryService('DATA_HISTORY', True, '데이터 관리 이력')
+
+# API 엔드포인트 함수들
+async def get_equipment_history(request: Request):
+    return await equipment_history_service.get_history_data(request)
+
+async def export_equipment_history(request: Request):
+    return await equipment_history_service.export_history_data(request)
+
+async def get_alarm_history(request: Request):
+    return await alarm_history_service.get_history_data(request)
+
+async def export_alarm_history(request: Request):
+    return await alarm_history_service.export_history_data(request)
+
+async def get_report_history(request: Request):
+    return await report_history_service.get_history_data(request)
+
+async def export_report_history(request: Request):
+    return await report_history_service.export_history_data(request)
+
+async def get_login_history(request: Request):
+    return await login_history_service.get_history_data(request)
+
+async def export_login_history(request: Request):
+    return await login_history_service.export_history_data(request)
+
+async def get_user_history(request: Request):
+    return await user_history_service.get_history_data(request)
+
+async def export_user_history(request: Request):
+    return await user_history_service.export_history_data(request)
+
+async def get_data_history(request: Request):
+    return await data_history_service.get_history_data(request)
+
+async def export_data_history(request: Request):
+    return await data_history_service.export_history_data(request)
