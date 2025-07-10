@@ -134,18 +134,18 @@ async def create_backup(request, is_manual: bool = True):
         backup_filename = "backup.bak"
         backup_path = os.path.join(BACKUP_DIR, backup_filename)
         
-        backup_type = "Auto"
+        backup_type = "자동 데이터 백업"
         current_user_id = None
         login_history_id = None
         
         if is_manual:
-            backup_type = "Manual"
+            backup_type = "수동 데이터 백업"
             params = dict(request.query_params)
             current_user_id = params.get('currentUserId')
             login_history_id = params.get('loginHistoryId')
         
         # 백업 파일 생성 전에 로그 저장
-        await save_data_history_log(f"Data Backup - {backup_type} ", current_user_id, login_history_id)
+        await save_data_history_log(f"데이터 백업 - {backup_type} ", current_user_id, login_history_id)
         
         # 구조 + 데이터 백업을 위한 mysqldump 명령
         try:
@@ -255,7 +255,7 @@ async def restore_backup(request, backup_file: UploadFile):
                     "message": f"데이터 복원 실패: {result.stderr}"
                 })
             
-            await save_data_history_log(f"Data Restore - File: {backup_file.filename}", current_user_id, login_history_id)
+            await save_data_history_log(f"데이터 복원 - 파일: {backup_file.filename}", current_user_id, login_history_id)
             
             return JSONResponse({
                 "success": True,

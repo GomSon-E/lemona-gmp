@@ -37,7 +37,7 @@ async def login_user(request: Request):
             
             if not user:
                 # 존재하지 않는 사용자 - 로그인 실패 기록
-                cursor.execute(login_history_query, (f'Login Failed - User Not Found : {user_id}', user_id, current_time))
+                cursor.execute(login_history_query, (f'로그인 실패 - 존재하지 않는 사용자 : {user_id}', user_id, current_time))
                 connection.commit()
                 
                 return JSONResponse({
@@ -47,7 +47,7 @@ async def login_user(request: Request):
             
             if not user['STATUS']:
                 # 비활성화된 사용자 - 로그인 실패 기록
-                cursor.execute(login_history_query, ('Login Failed - User Deactivated', user_id, current_time))
+                cursor.execute(login_history_query, ('로그인 실패 - 비활성화된 사용자', user_id, current_time))
                 connection.commit()
                 
                 return JSONResponse({
@@ -59,7 +59,7 @@ async def login_user(request: Request):
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             if user['PW'] != hashed_password:
                 # 비밀번호 불일치 - 로그인 실패 기록
-                cursor.execute(login_history_query, ('Login Failed - Wrong Password', user_id, current_time))
+                cursor.execute(login_history_query, ('로그인 실패 - 비밀번호 불일치', user_id, current_time))
                 connection.commit()
                 
                 # 로그인 실패 후 계정 잠금 처리
@@ -71,7 +71,7 @@ async def login_user(request: Request):
                 })
             
             # 로그인 성공 처리
-            cursor.execute(login_history_query, ('Login Success', user_id, current_time))
+            cursor.execute(login_history_query, ('로그인 성공', user_id, current_time))
             login_history_id = cursor.lastrowid
 
             # PLC에 사용자 권한 레벨 쓰기
@@ -166,18 +166,6 @@ async def handle_login_failure(cursor, user_id, current_time, connection):
                 WHERE USER_ID = %s
             """
             cursor.execute(deactivate_query, (current_time.date(), user_id))
-            
-            # 계정 잠금 기록 저장
-            lock_record_query = """
-                INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
-                VALUES (%s, %s, %s)
-            """
-            cursor.execute(lock_record_query, (
-                f'Account Locked - {consecutive_failures} consecutive failed attempts in 30 minutes', 
-                user_id, 
-                current_time
-            ))
-            
             connection.commit()
             
     except Exception as e:
@@ -199,11 +187,11 @@ async def logout_user(request: Request):
             
             # 로그아웃 타입에 따른 메시지 설정
             if logout_type == 'auto':
-                content = 'Logout - Auto Logout (5min inactivity)'
+                content = '로그아웃 - 자동 로그아웃'
             elif logout_type == 'session_expired':
-                content = 'Logout - Session Expired (5min)'
+                content = '로그아웃 - 자동 로그아웃'
             else:
-                content = 'Logout - Manual Logout'
+                content = '로그아웃 - 수동 로그아웃'
             
             logout_history_query = """
                 INSERT INTO LOGIN_HISTORY (CONTENT, USER_ID, CREATE_DT)
@@ -275,7 +263,7 @@ async def create_user(request: Request):
             connection.commit()
             
             # User History 로그 저장
-            log_content = f"User Created - ID: {user_data['userId']}, Name: {user_data['fullName']}, Division: {user_data['division']}, Role: {user_data['role']}"
+            log_content = f"사용자 생성 - ID: {user_data['userId']}, 이름: {user_data['fullName']}, 부서: {user_data['division']}, 권한: {user_data['role']}"
             await save_user_history_log(log_content, current_user_id, login_history_id)
             
             return JSONResponse({
@@ -546,8 +534,8 @@ async def update_user(user_id: str, request: Request):
             connection.commit()
             
             # User History 로그 저장
-            status_text = "Active" if user_data['status'] == '1' else "Inactive"
-            log_content = f"User Updated - ID: {user_id}, Name: {user_data['name']}, Division: {user_data['division']}, Role: {user_data['roleId']}, Status: {status_text}"
+            status_text = "활성" if user_data['status'] == '1' else "비활성"
+            log_content = f"사용자 수정 - ID: {user_id}, 이름: {user_data['name']}, 부서: {user_data['division']}, 권한: {user_data['roleId']}, 상태: {status_text}"
             await save_user_history_log(log_content, current_user_id, login_history_id)
             
             return JSONResponse({

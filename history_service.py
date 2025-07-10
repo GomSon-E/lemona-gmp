@@ -16,11 +16,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 
 class HistoryService:
-    def __init__(self, table_name, comment_join=True, report_title="", log_title=""):
+    def __init__(self, table_name, comment_join=True, report_title=""):
         self.table_name = table_name
         self.comment_join = comment_join
         self.report_title = report_title
-        self.log_title = log_title
     
     async def get_history_data(self, request: Request):
         try:
@@ -193,7 +192,7 @@ class HistoryService:
                 pdf_buffer = self.generate_pdf_report(data, params)
                 
                 current_time = datetime.now()
-                report_content = f"Report Generated - {self.log_title}"
+                report_content = f"보고서 생성 - {self.report_title}"
                 
                 # REPORT_HISTORY에 기록 저장
                 report_history_query = """
@@ -413,12 +412,12 @@ class HistoryService:
         return table_data
 
 # 각 히스토리 테이블별 서비스 인스턴스 생성
-equipment_history_service = HistoryService('EQUIPMENT_HISTORY', True, '설비 가동 이력', 'Equipment Operation History')
-alarm_history_service = HistoryService('ALARM_HISTORY', True, '설비 알람 이력', 'Equipment Alarm History')
-report_history_service = HistoryService('REPORT_HISTORY', True, '보고서 생성 이력', 'Report Generation History')
-login_history_service = HistoryService('LOGIN_HISTORY', True, '접속 이력', 'Login/Logout History')
-user_history_service = HistoryService('USER_HISTORY', True, '사용자 관리 이력', 'User Management History')
-data_history_service = HistoryService('DATA_HISTORY', True, '데이터 관리 이력', 'Data Management History')
+equipment_history_service = HistoryService('EQUIPMENT_HISTORY', True, '설비 가동 이력')
+alarm_history_service = HistoryService('ALARM_HISTORY', True, '설비 알람 이력')
+report_history_service = HistoryService('REPORT_HISTORY', True, '보고서 생성 이력')
+login_history_service = HistoryService('LOGIN_HISTORY', True, '접속 이력')
+user_history_service = HistoryService('USER_HISTORY', True, '사용자 관리 이력')
+data_history_service = HistoryService('DATA_HISTORY', True, '데이터 관리 이력')
 
 # API 엔드포인트 함수들
 async def get_equipment_history(request: Request):
