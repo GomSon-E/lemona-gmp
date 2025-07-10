@@ -6,15 +6,18 @@ function initUserCreatePage() {
     setupRoleOptions();
 
     $(document).on('submit', '#userCreateForm', function(e) {
-        console.log('폼 제출 이벤트 발생');
         e.preventDefault();
         e.stopPropagation();
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         
         const formData = {
             userId: $('#userId').val(),
             fullName: $('#fullName').val(),
             division: $('#division').val(),
-            role: $('#userRole').val()
+            role: $('#userRole').val(),
+            currentUserId: currentUser.userId,
+            loginHistoryId: currentUser.loginHistoryId 
         };
         
         // 간단한 유효성 검사

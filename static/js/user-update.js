@@ -216,11 +216,15 @@ function initUserUpdatePage() {
             return;
         }
 
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
         const formData = {
             name: $('#detailUserName').val(),
             division: $('#detailDivision').val(),
             status: $('#detailStatus').val(),
-            roleId: $('#detailRole').val()
+            roleId: $('#detailRole').val(),
+            currentUserId: currentUser.userId,
+            loginHistoryId: currentUser.loginHistoryId 
         };
 
         // 유효성 검사
@@ -279,12 +283,16 @@ function initUserUpdatePage() {
         const originalText = $button.text();
         $button.text('초기화 중...').prop('disabled', true);
 
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
         $.ajax({
             url: '/api/users/password/reset',
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({
-                userId: window.selectedUser.USER_ID
+                userId: window.selectedUser.USER_ID,
+                currentUserId: currentUser.userId,
+                loginHistoryId: currentUser.loginHistoryId 
             }),
             success: function(response) {
                 if (response.success) {

@@ -1,7 +1,7 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import hashlib
-from datetime import date, timedelta
+from datetime import datetime,date, timedelta
 from mysql.connector import Error
 from database import get_db_connection
 
@@ -232,6 +232,10 @@ async def create_user(request: Request):
     try:
         user_data = await request.json()
         
+        # 현재 사용자 정보 추출
+        current_user_id = user_data.get('currentUserId', 'system')
+        login_history_id = user_data.get('loginHistoryId')
+        
         with get_db_connection() as connection:
             cursor = connection.cursor()
             
@@ -263,6 +267,10 @@ async def create_user(request: Request):
 
             connection.commit()
             
+            # User History 로그 저장
+            log_content = f"User Created - ID: {user_data['userId']}, Name: {user_data['fullName']}, Division: {user_data['division']}, Role: {user_data['role']}"
+            await save_user_history_log(log_content, current_user_id, login_history_id)
+            
             return JSONResponse({
                 "success": True,
                 "message": "사용자가 성공적으로 생성되었습니다.",
@@ -284,7 +292,8 @@ async def create_user(request: Request):
             "success": False,
             "message": "서버 내부 오류가 발생했습니다."
         })
-    
+
+
 # ! 비밀번호 변경
 async def change_password(request: Request):
     try:
@@ -319,7 +328,7 @@ async def change_password(request: Request):
             new_hashed = hashlib.sha256(new_password.encode()).hexdigest()
             
             # 비밀번호 업데이트
-            current_time = date.today()
+            current_time = datetime.now()
             update_query = """
                 UPDATE USER 
                 SET PW = %s, PW_UPDATE_DT = %s, UPDATE_DT = %s 
@@ -397,7 +406,7 @@ async def reset_password(request: Request):
             "success": False,
             "message": "서버 내부 오류가 발생했습니다."
         })
-    
+
 # ! 전체 사용자 조회
 async def get_all_users():
     try:
@@ -494,6 +503,10 @@ async def update_user(user_id: str, request: Request):
     try:
         user_data = await request.json()
         
+        # 현재 사용자 정보 추출
+        current_user_id = user_data.get('currentUserId', 'system')
+        login_history_id = user_data.get('loginHistoryId')
+        
         with get_db_connection() as connection:
             cursor = connection.cursor()
             
@@ -525,6 +538,11 @@ async def update_user(user_id: str, request: Request):
 
             connection.commit()
             
+            # User History 로그 저장
+            status_text = "Active" if user_data['status'] == '1' else "Inactive"
+            log_content = f"User Updated - ID: {user_id}, Name: {user_data['name']}, Division: {user_data['division']}, Role: {user_data['roleId']}, Status: {status_text}"
+            await save_user_history_log(log_content, current_user_id, login_history_id)
+            
             return JSONResponse({
                 "success": True,
                 "message": "사용자 정보가 성공적으로 수정되었습니다."
@@ -542,3 +560,37 @@ async def update_user(user_id: str, request: Request):
             "success": False,
             "message": "서버 내부 오류가 발생했습니다."
         })
+    
+#! 사용자 관리 이력 저장
+async def save_user_history_log(content: str, user_id: str, login_history_id: str = None):
+    try: 
+        with get_db_connection() as connection:
+            cursor = connection.cursor(dictionary=True)
+            
+            # 로그인 히스토리에서 코멘트 ID 조회
+            comment_id = None
+            if login_history_id:
+                comment_query = """
+                    SELECT COMMENT_ID 
+                    FROM LOGIN_HISTORY 
+                    WHERE ID = %s
+                """
+                cursor.execute(comment_query, (login_history_id,))
+                comment_result = cursor.fetchone()
+                if comment_result and comment_result['COMMENT_ID']:
+                    comment_id = comment_result['COMMENT_ID']
+            
+            current_time = datetime.now()
+            
+            insert_query = """
+                INSERT INTO USER_HISTORY (CONTENT, USER_ID, COMMENT_ID, CREATE_DT)
+                VALUES (%s, %s, %s, %s)
+            """
+            
+            cursor.execute(insert_query, (content, user_id, comment_id, current_time))
+            connection.commit()
+            
+            print(f"User History 로그 저장 완료: {content} by {user_id}, comment_id: {comment_id}")
+            
+    except Exception as e:
+        print(f"User History 로그 저장 실패: {e}")
