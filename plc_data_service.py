@@ -274,7 +274,7 @@ class PLCDataCollector:
                 query = """
                     SELECT USER_ID, COMMENT_ID 
                     FROM LOGIN_HISTORY 
-                    WHERE CONTENT = 'Login Success' 
+                    WHERE CONTENT = '로그인 성공' 
                     ORDER BY CREATE_DT DESC 
                     LIMIT 1
                 """
