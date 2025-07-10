@@ -322,17 +322,68 @@ class AuditTrailService:
         story.append(Paragraph(f"{self.report_title} 보고서", title_style))
         story.append(Spacer(1, 12))
         
-        # 필터 조건 표시
-        filter_info = self.create_filter_info(filters)
-        if filter_info:
-            story.append(Paragraph("검색 조건:", heading_style))
-            story.append(Paragraph(filter_info, normal_style))
-            story.append(Spacer(1, 12))
+        # 검색 조건을 표 형태로 표시 (항상 표시)
+        story.append(Paragraph("검색 조건:", heading_style))
+        
+        filter_table_data = self.create_filter_table_data(filters)
+        
+        # 4개 컬럼 균등 분배 (총 8인치)
+        filter_col_widths = [2*inch, 2*inch, 2*inch, 2*inch]
+        
+        # 검색 조건 테이블 생성
+        filter_table = Table(filter_table_data, colWidths=filter_col_widths)
+        filter_table.setStyle(TableStyle([
+            # 헤더 스타일
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), korean_font),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),  # 헤더 폰트 크기
+            ('FONTSIZE', (0, 1), (-1, 1), 9),   # 데이터 폰트 크기
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(filter_table)
+        story.append(Spacer(1, 12))
         
         # 출력 정보
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        story.append(Paragraph(f"출력일시: {current_time}", normal_style))
-        story.append(Paragraph(f"총 건수: {len(data):,}건", normal_style))
+        report_info_data = [
+            ['출력일시', current_time],
+            ['총 건수', f'{len(data):,}건']
+        ]
+        
+        story.append(Paragraph("보고서 정보:", heading_style))
+        
+        # 보고서 정보 테이블 생성
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+        # 보고서 정보 헤더와 데이터
+        report_info_header = ['출력일시', '총 건수']
+        report_info_data = [current_time, f'{len(data):,}건']
+        report_info_table_data = [report_info_header, report_info_data]
+        
+        # 보고서 정보 테이블 생성
+        report_info_col_widths = [4*inch, 4*inch]
+        report_info_table = Table(report_info_table_data, colWidths=report_info_col_widths)
+        report_info_table.setStyle(TableStyle([
+            # 헤더 스타일
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), korean_font),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),  # 헤더 폰트 크기
+            ('FONTSIZE', (0, 1), (-1, 1), 9),   # 데이터 폰트 크기
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(report_info_table)
         story.append(Spacer(1, 20))
         
         # 테이블 데이터 생성
@@ -375,26 +426,42 @@ class AuditTrailService:
         buffer.seek(0)
         return buffer.read()
     
-    def create_filter_info(self, filters):
-        """필터 조건 문자열 생성"""
-        filter_parts = []
+    def create_filter_table_data(self, filters):
+        """검색 조건 테이블 데이터 생성"""
         
+        # 헤더 행
+        header_row = ['기간', '사용자 ID', '작업내용', '코멘트']
+        
+        # 데이터 행
+        data_row = []
+        
+        # 기간
         if filters.get('startDate') or filters.get('endDate'):
-            start = filters.get('startDate', '시작일 없음')
-            end = filters.get('endDate', '종료일 없음')
-            filter_parts.append(f"기간: {start} ~ {end}")
+            start = filters.get('startDate', '')
+            end = filters.get('endDate', '')
+            if start and end:
+                period_value = f'{start} ~ {end}'
+            elif start:
+                period_value = f'{start} ~'
+            elif end:
+                period_value = f'~ {end}'
+            else:
+                period_value = ''
+        else:
+            period_value = ''
+        data_row.append(period_value)
         
-        if filters.get('userId'):
-            filter_parts.append(f"사용자 ID: {filters['userId']}")
+        # 사용자 ID
+        data_row.append(filters.get('userId', ''))
         
-        if filters.get('content'):
-            filter_parts.append(f"작업내용: {filters['content']}")
+        # 작업내용
+        data_row.append(filters.get('content', ''))
         
-        if filters.get('comment'):
-            filter_parts.append(f"코멘트: {filters['comment']}")
+        # 코멘트
+        data_row.append(filters.get('comment', ''))
         
-        return " | ".join(filter_parts) if filter_parts else "전체 데이터"
-    
+        return [header_row, data_row]
+
     def create_table_data(self, data):
         """테이블 데이터 생성 - CATEGORY 컬럼 추가"""
         # 헤더 행 (카테고리 추가)
