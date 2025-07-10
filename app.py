@@ -72,11 +72,11 @@ async def update_user_api(user_id: str, request: Request):
 async def create_user_api(request: Request):
     return await create_user(request)
 
-@app.put("/api/users/password")
+@app.put("/api/password/change")
 async def change_password_api(request: Request):
     return await change_password(request)
 
-@app.put("/api/users/password/reset")
+@app.put("/api/password/reset")
 async def reset_user_password_api(request: Request):
     return await reset_password(request)
 

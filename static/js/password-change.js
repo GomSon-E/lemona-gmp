@@ -31,7 +31,7 @@ function initPasswordChangePage() {
         $button.text('변경 중...').prop('disabled', true);
         
         $.ajax({
-            url: '/api/users/password',
+            url: '/api/password/change',
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({

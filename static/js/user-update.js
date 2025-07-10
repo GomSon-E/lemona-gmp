@@ -286,7 +286,7 @@ function initUserUpdatePage() {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
         $.ajax({
-            url: '/api/users/password/reset',
+            url: '/api/password/reset',
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({
