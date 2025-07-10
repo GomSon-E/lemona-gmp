@@ -263,7 +263,8 @@ async def create_user(request: Request):
             connection.commit()
             
             # User History 로그 저장
-            log_content = f"사용자 생성 - ID: {user_data['userId']}, 이름: {user_data['fullName']}, 부서: {user_data['division']}, 권한: {user_data['role']}"
+            role_name = get_role_name_by_id(user_data['role'])
+            log_content = f"사용자 생성 - ID: {user_data['userId']}, 이름: {user_data['fullName']}, 부서: {user_data['division']}, 권한: {role_name}"
             await save_user_history_log(log_content, current_user_id, login_history_id)
             
             return JSONResponse({
@@ -296,6 +297,7 @@ async def change_password(request: Request):
         user_id = password_data['userId']
         current_password = password_data['currentPassword']
         new_password = password_data['newPassword']
+        login_history_id = password_data.get('loginHistoryId')
         
         with get_db_connection() as connection:
             cursor = connection.cursor(dictionary=True)
@@ -332,6 +334,10 @@ async def change_password(request: Request):
             
             cursor.execute(update_query, (new_hashed, current_time, current_time, user_id))
             connection.commit()
+
+            # User History 로그 저장
+            log_content = f"비밀번호 변경"
+            await save_user_history_log(log_content, user_id, login_history_id)
             
             return JSONResponse({
                 "success": True,
@@ -356,6 +362,8 @@ async def reset_password(request: Request):
     try:
         reset_data = await request.json()
         target_user_id = reset_data['userId']
+        current_user_id = reset_data.get('currentUserId', None)
+        login_history_id = reset_data.get('loginHistoryId')
         
         with get_db_connection() as connection:
             cursor = connection.cursor()
@@ -384,6 +392,10 @@ async def reset_password(request: Request):
             cursor.execute(update_query, (hashed_password, current_date, target_user_id))
             connection.commit()
             
+            # User History 로그 저장
+            log_content = f"비밀번호 초기화 - 대상자: {target_user_id}"
+            await save_user_history_log(log_content, current_user_id, login_history_id)
+
             return JSONResponse({
                 "success": True,
                 "message": "비밀번호가 성공적으로 초기화되었습니다."
@@ -535,7 +547,8 @@ async def update_user(user_id: str, request: Request):
             
             # User History 로그 저장
             status_text = "활성" if user_data['status'] == '1' else "비활성"
-            log_content = f"사용자 수정 - ID: {user_id}, 이름: {user_data['name']}, 부서: {user_data['division']}, 권한: {user_data['roleId']}, 상태: {status_text}"
+            role_name = get_role_name_by_id(user_data['roleId'])
+            log_content = f"사용자 수정 - ID: {user_id}, 이름: {user_data['name']}, 부서: {user_data['division']}, 권한: {role_name}, 상태: {status_text}"
             await save_user_history_log(log_content, current_user_id, login_history_id)
             
             return JSONResponse({
@@ -589,3 +602,13 @@ async def save_user_history_log(content: str, user_id: str, login_history_id: st
             
     except Exception as e:
         print(f"User History 로그 저장 실패: {e}")
+
+# ! 권한ID로 권한명 조회
+def get_role_name_by_id(role_id):
+    role_mapping = {
+        1: 'ROOT',
+        2: 'ADMIN', 
+        3: 'MANAGER',
+        4: 'USER'
+    }
+    return role_mapping.get(int(role_id), None)

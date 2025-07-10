@@ -37,7 +37,8 @@ function initPasswordChangePage() {
             data: JSON.stringify({
                 userId: formData.userId,
                 currentPassword: formData.currentPassword,
-                newPassword: formData.newPassword
+                newPassword: formData.newPassword,
+                loginHistoryId: JSON.parse(localStorage.getItem('currentUser')).loginHistoryId
             }),
             success: function(response) {
                 console.log('API 응답:', response);
