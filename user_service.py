@@ -4,6 +4,7 @@ import hashlib
 from datetime import datetime,date, timedelta
 from mysql.connector import Error
 from database import get_db_connection
+from plc_data_service import plc_collector
 
 # ! 사용자 로그인
 async def login_user(request: Request):
@@ -72,6 +73,9 @@ async def login_user(request: Request):
             # 로그인 성공 처리
             cursor.execute(login_history_query, ('Login Success', user_id, current_time))
             login_history_id = cursor.lastrowid
+
+            # PLC에 사용자 권한 레벨 쓰기
+            await plc_collector.write_user_level(user['ROLE_ID'])
             
             # 비밀번호 변경 필요 여부 체크
             password_change_required = False
@@ -208,6 +212,9 @@ async def logout_user(request: Request):
             
             cursor.execute(logout_history_query, (content, user_id, current_time))
             connection.commit()
+
+            # 로그아웃 시 PLC 권한 레벨을 0으로 설정
+            await plc_collector.write_user_level(0)
             
             return JSONResponse({
                 "success": True,

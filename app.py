@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import UploadFile, File
 import uvicorn
 from contextlib import asynccontextmanager
+import asyncio
 
 from user_service import login_user, logout_user, create_user, change_password, reset_password, get_all_users, get_user, update_user
 from access_service import get_access, get_all_pages, update_access
@@ -18,17 +19,37 @@ from history_service import (
     get_user_history, export_user_history,
     get_data_history, export_data_history
 )
+from plc_data_service import plc_collector
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # 애플리케이션 시작 시
     try:
         print("애플리케이션 시작 - 초기 백업 생성 중...")
         backup_response = await create_backup(None, is_manual=False)
         print("초기 백업 생성 완료")
+        
+        # PLC 데이터 수집 시작
+        collection_task = asyncio.create_task(plc_collector.start_collection())
+        
     except Exception as e:
-        print(f"초기 백업 생성 실패: {e}")
+        print(f"애플리케이션 시작 오류: {e}")
     
     yield
+    
+    # 애플리케이션 종료 시
+    try:
+        print("애플리케이션 종료 - PLC 데이터 수집 중지...")
+        await plc_collector.stop_collection()
+        collection_task.cancel()
+        print("PLC 데이터 수집 중지 완료")
+    except Exception as e:
+        print(f"애플리케이션 종료 오류: {e}")
+
+app = FastAPI(
+    title="보틀포장 1호기 데이터 & 권한 관리 S/W API",
+    lifespan=lifespan
+)
 
 app = FastAPI(
     title="보틀포장 1호기 데이터 & 권한 관리 S/W API",
