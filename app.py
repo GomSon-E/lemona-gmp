@@ -59,7 +59,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def root_page():
-    return FileResponse('static/html/login.html')
+    return FileResponse('static/html/landing.html')
 
 @app.get("/login")
 async def login_page():
