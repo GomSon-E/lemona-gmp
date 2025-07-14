@@ -37,7 +37,7 @@ async def login_user(request: Request):
             
             if not user:
                 # 존재하지 않는 사용자 - 로그인 실패 기록
-                cursor.execute(login_history_query, (f'로그인 실패 - 존재하지 않는 사용자 : {user_id}', user_id, current_time))
+                cursor.execute(login_history_query, (f'로그인 실패 - 존재하지 않는 사용자 : {user_id}', None, current_time))
                 connection.commit()
                 
                 return JSONResponse({
@@ -151,9 +151,9 @@ async def handle_login_failure(cursor, user_id, current_time, connection):
         # 연속 실패 횟수 계산
         consecutive_failures = 0
         for attempt in recent_attempts:
-            if 'Login Failed' in attempt['CONTENT']:
+            if '로그인 실패' in attempt['CONTENT']:
                 consecutive_failures += 1
-            elif 'Login Success' in attempt['CONTENT']:
+            elif '로그인 성공' in attempt['CONTENT']:
                 # 성공 기록이 있으면 연속 실패 카운트 중단
                 break
         
