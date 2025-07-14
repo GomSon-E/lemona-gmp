@@ -192,7 +192,6 @@ class HistoryBasePage {
                     // 마지막 업데이트 시간 갱신 (서버 시간 사용)
                     if (response.serverTime) {
                         this.lastUpdateTime = response.serverTime;
-                        console.log(`마지막 업데이트 시간 갱신: ${this.lastUpdateTime} (서버 시간)`);
                     } else {
                         // 백업으로 클라이언트 시간 사용 (MySQL 형식)
                         const now = new Date();
@@ -202,7 +201,6 @@ class HistoryBasePage {
                                            String(now.getHours()).padStart(2, '0') + ':' + 
                                            String(now.getMinutes()).padStart(2, '0') + ':' + 
                                            String(now.getSeconds()).padStart(2, '0');
-                        console.log(`마지막 업데이트 시간 갱신: ${this.lastUpdateTime} (클라이언트 시간)`);
                     }
                 } else {
                     this.showError(response.message);
@@ -404,14 +402,15 @@ class HistoryBasePage {
     formatDateTime(datetime) {
         if (!datetime) return '';
         const d = new Date(datetime);
-        return d.toLocaleString('ko-KR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hour = String(d.getHours()).padStart(2, '0');
+        const minute = String(d.getMinutes()).padStart(2, '0');
+        const second = String(d.getSeconds()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     }
     
     // 정리 메서드
