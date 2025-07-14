@@ -24,7 +24,7 @@ async def login_user(request: Request):
                 SELECT u.USER_ID, u.PW, u.NAME, u.DIVISION, u.STATUS, u.ROLE_ID, r.ROLE_NAME, u.PW_UPDATE_DT
                 FROM USER u
                 LEFT JOIN ROLE r ON u.ROLE_ID = r.ROLE_ID
-                WHERE u.USER_ID = %s
+                WHERE BINARY u.USER_ID = %s
             """
             cursor.execute(query, (user_id,))
             user = cursor.fetchone()
