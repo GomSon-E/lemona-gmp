@@ -166,7 +166,7 @@ function initPasswordChangePage() {
             uppercase: /[A-Z]/.test(password),
             lowercase: /[a-z]/.test(password),
             number: /\d/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            special: /[!@#$%^&*(),.?":{}|<>~\[\]';\/\\`_+=\-]/.test(password)
         };
         
         return Object.values(requirements).every(req => req);
@@ -179,7 +179,7 @@ function initPasswordChangePage() {
             { test: /[A-Z]/.test(password), text: '대문자 포함' },
             { test: /[a-z]/.test(password), text: '소문자 포함' },
             { test: /\d/.test(password), text: '숫자 포함' },
-            { test: /[!@#$%^&*(),.?":{}|<>]/.test(password), text: '특수문자 포함' }
+            { test: /[!@#$%^&*(),.?":{}|<>~\[\]';\/\\`_+=\-]/.test(password), text: '특수문자 포함' }
         ];
 
         $('.requirement-item').each(function(index) {
