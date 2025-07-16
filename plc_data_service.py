@@ -134,8 +134,13 @@ class PLCDataCollector:
     async def monitor_daily_production(self):
         while self.running:
             try:
-                values = self.client.batchread_wordunits(headdevice="D6005", readsize=1)
-                production_count = values[0]
+                # 2워드 읽기 (D6006, D6007)
+                values = self.client.batchread_wordunits(headdevice="D6006", readsize=2)
+                production_count_low = values[0]   # 하위 워드
+                production_count_high = values[1]  # 상위 워드
+                
+                # 2워드를 32비트 정수로 결합
+                production_count = (production_count_high << 16) + production_count_low
                 
                 if production_count != 0:
                     content = f"일 생산수량: {production_count}개"
@@ -147,11 +152,11 @@ class PLCDataCollector:
                     await self.save_equipment_history(content, user_id, comment_id)
                     print(f"일 생산수량 업데이트: {content} (User: {user_id})")
                     
-                    # 다시 0으로 쓰기
-                    self.client.batchwrite_wordunits(headdevice="D6005", values=[0])
+                    # 두 워드 모두 0으로 쓰기
+                    self.client.batchwrite_wordunits(headdevice="D6006", values=[0, 0])
                 
                 await asyncio.sleep(0.5)
-                
+            
             except Exception as e:
                 print(f"일 생산수량 모니터링 오류: {e}")
                 await asyncio.sleep(5)
