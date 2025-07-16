@@ -76,7 +76,7 @@ class PLCDataCollector:
                 if status_value != 0:
                     # 상태 메시지 매핑
                     status_messages = {
-                        1: "자동 OFF", 2: "자동 ON", 3: "수동",
+                        1: "전원 OFF", 2: "전원 ON", 3: "수동",
                         4: "자동운전 대기", 5: "자동운전 중"
                     }
                     
