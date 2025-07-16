@@ -467,8 +467,10 @@ class HistoryService:
             # 사용자 ID
             user_id = row.get('USER_ID', '') or ''
             
-            # 작업내용
+            # 작업내용 (40자 제한)
             content = row.get('CONTENT', '') or ''
+            if len(content) > 40:
+                content = content[:40] + '...'
             
             if self.comment_join:
                 # 코멘트 (20자 제한)
