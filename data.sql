@@ -164,19 +164,19 @@ INSERT INTO ROLE (ROLE_NAME) VALUES
 ('USER');
 
 INSERT INTO PAGE (PAGE_LINK, MENU_NAME, PAGE_NAME) VALUES
-('equipment-history', '이력 조회', '설비 가동 이력 조회'),
-('alarm-history', '이력 조회', '설비 알람 이력 조회'), 
-('report-history', '이력 조회', '보고서 생성 이력 조회'),
-('login-history', '이력 조회', '접속 이력 조회'),
-('user-history', '이력 조회', '사용자 관리 이력 조회'),
-('data-history', '이력 조회', '데이터 관리 이력 조회'),
-('user-create', '사용자 관리', '사용자 생성'),
-('user-update', '사용자 관리', '사용자 수정'),
-('access-update', '사용자 관리', '권한별 접근 가능 페이지 관리'),
-('password-change', '사용자 관리', '비밀번호 변경'),
-('audit-trail', '감사 추적', 'Audit Trail'),
-('backup-restore', '데이터 관리', '데이터 백업/복원'),
-('plc-test', 'PLC 테스트', 'PLC 통신 테스트');
+('equipment-history', '이력 조회', '설비 가동 이력 조회'), -- 1
+('alarm-history', '이력 조회', '설비 알람 이력 조회'),  -- 2
+('report-history', '이력 조회', '보고서 생성 이력 조회'), -- 3
+('login-history', '이력 조회', '접속 이력 조회'), -- 4
+('user-history', '이력 조회', '사용자 관리 이력 조회'), -- 5
+('data-history', '이력 조회', '데이터 관리 이력 조회'), -- 6
+('user-create', '사용자 관리', '사용자 생성'), -- 7
+('user-update', '사용자 관리', '사용자 수정'), -- 8
+('access-update', '사용자 관리', '권한별 접근 가능 페이지 관리'), -- 9
+('password-change', '사용자 관리', '비밀번호 변경'), -- 10
+('audit-trail', '감사 추적', 'Audit Trail'), -- 11
+('backup-restore', '데이터 관리', '데이터 백업/복원'), -- 12
+('plc-test', 'PLC 테스트', 'PLC 통신 테스트'); -- 13
 
 INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('1', '7'),
@@ -199,16 +199,16 @@ INSERT INTO ACCESS (ROLE_ID, PAGE_ID) VALUES
 ('3', '4'),
 ('3', '5'),
 ('3', '6'),
+('3', '10'),
 ('3', '11'),
-('3', '12'),
 ('4', '1'),
 ('4', '2'),
 ('4', '3'),
 ('4', '4'),
 ('4', '5'),
 ('4', '6'),
-('4', '11'),
-('4', '12');
+('4', '10'),
+('4', '11');
 
 INSERT INTO USER (USER_ID, PW, NAME, DIVISION, STATUS, ROLE_ID, PW_UPDATE_DT, CREATE_DT, UPDATE_DT) VALUES 
 ('root', '6cbefd8960d511540f34779628ef4e5a55b758d3be5749cd8878a09b348c052b', '시스템 관리자', 'IT부서', TRUE, 1, CURDATE(), CURDATE(), CURDATE()); 
@@ -297,3 +297,7 @@ INSERT INTO ALARM_LIST (ID, CONTENT) VALUES
 (109, 'PC 알람 이벤트 읽기 신호 미확인 알람 !!'),
 (110, 'PC 일 생산 수량 이벤트 읽기 신호 미확인 알람 !!'),
 (111, 'PC 현재 모델 변경 이벤트 읽기 신호 미확인 알람 !!');
+
+select * from login_history;
+select * from equipment_history;
+select * from alarm_history;
