@@ -170,7 +170,9 @@ class PLCDataCollector:
                     
                     # 6020~6029번에서 모델 품번 읽기 (10개)
                     part_numbers = self.client.batchread_wordunits(headdevice="D6020", readsize=10)
-                    part_number_str = "".join([str(num) for num in part_numbers if num != 0])
+                    
+                    # 아스키 코드를 문자열로 변환
+                    part_number_str = self.convert_words_to_string(part_numbers)
                     
                     content = f"모델 변경 - 모델번호: {model_number}, 모델타입: {model_type}, 품번: {part_number_str}"
                     
@@ -189,6 +191,41 @@ class PLCDataCollector:
             except Exception as e:
                 print(f"모델 변경 모니터링 오류: {e}")
                 await asyncio.sleep(5)
+
+    # ! 아스키 코드 리스트를 문자열로 변환
+    def convert_words_to_string(self, word_values):
+        try:
+            result = ""
+            
+            for word_value in word_values:
+                if word_value == 0:  # 0이면 문자열 종료
+                    break
+                    
+                # 16비트를 상위 8비트와 하위 8비트로 분할
+                high_byte = (word_value >> 8) & 0xFF  # 상위 8비트
+                low_byte = word_value & 0xFF          # 하위 8비트
+                
+                # 하위 바이트 처리
+                if low_byte != 0:  # 0이 아닌 경우만 처리
+                    if 32 <= low_byte <= 126:  # 출력 가능한 아스키 문자
+                        result += chr(low_byte)
+                    elif low_byte == 32:  # 공백 문자도 포함하되 연속 공백은 하나로
+                        if not result.endswith(' '):
+                            result += ' '
+
+                # 상위 바이트 처리
+                if high_byte != 0:  # 0이 아닌 경우만 처리
+                    if 32 <= high_byte <= 126:  # 출력 가능한 아스키 문자
+                        result += chr(high_byte)
+                    elif high_byte == 32:  # 공백 문자도 포함하되 연속 공백은 하나로
+                        if not result.endswith(' '):
+                            result += ' '
+            
+            return result.strip()  # 앞뒤 공백 제거
+        
+        except Exception as e:
+            print(f"16비트 워드 변환 오류: {e}")
+            return "변환 실패"
     
     # ! 6040, 6041, 6042번에 PC 시간 쓰기
     async def update_pc_time(self):
