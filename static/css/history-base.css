@@ -1,6 +1,6 @@
 .history-container {
     width: 100%;
-    max-width: 1600px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 40px;
     background-color: #FFFFFF;
@@ -107,15 +107,29 @@
     box-shadow: 0 0 0 3px rgba(254, 242, 0, 0.3);
 }
 
-.date-range {
+.date-time-range {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
+}
+
+.datetime-input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.datetime-input-group input[type="date"],
+.datetime-input-group input[type="time"] {
+    flex: 1;
+    min-width: 120px;
 }
 
 .date-separator {
     color: #040707;
     font-weight: bold;
+    margin: 0 5px;
 }
 
 .filter-actions {
@@ -340,9 +354,18 @@
         min-width: 100%;
     }
 
-    .date-range {
+    .date-time-range {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
+    }
+    
+    .datetime-input-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .date-separator {
+        align-self: center;
     }
 
     .data-table thead th,

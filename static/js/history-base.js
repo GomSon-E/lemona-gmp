@@ -44,12 +44,14 @@ class HistoryBasePage {
         // 테이블 헤더 생성
         this.createTableHeader();
         
-        // 기본 날짜 설정 (최근 30일)
-        const today = new Date();
-        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+        // 기본 날짜 및 시간 설정 (최근 24시간)
+        const now = new Date();
+        const yesterday = new Date(now.getTime() - (24 * 60 * 60 * 1000));
         
-        $('#endDate').val(this.formatDate(today));
-        $('#startDate').val(this.formatDate(thirtyDaysAgo));
+        $('#endDate').val(this.formatDate(now));
+        $('#endTime').val(this.formatTime(now));
+        $('#startDate').val(this.formatDate(yesterday));
+        $('#startTime').val(this.formatTime(yesterday));
     }
 
     updateFilterLabels() {
@@ -90,7 +92,10 @@ class HistoryBasePage {
         
         // 검색 버튼
         $(document).on('click.historyBase', '#searchBtn', () => {
-            this.search();
+            // 날짜/시간 유효성 검사 후 검색
+            if (this.validateDateTimeRange()) {
+                this.search();
+            }
         });
         
         // 초기화 버튼
@@ -100,7 +105,10 @@ class HistoryBasePage {
         
         // 보고서 추출 버튼
         $(document).on('click.historyBase', '#exportBtn', () => {
-            this.exportReport();
+            // 날짜/시간 유효성 검사 후 추출
+            if (this.validateDateTimeRange()) {
+                this.exportReport();
+            }
         });
         
         // 자동 새로고침 체크박스
@@ -112,14 +120,52 @@ class HistoryBasePage {
             }
         });
         
-        // Enter 키 검색
+        // Enter 키 검색 (유효성 검사 포함)
         $(document).on('keypress.historyBase', '.filter-input', (e) => {
             if (e.which === 13) {
-                this.search();
+                if (this.validateDateTimeRange()) {
+                    this.search();
+                }
             }
         });
+        
     }
-    
+
+    // ! 날짜/시간 범위 유효성 검사
+    validateDateTimeRange() {
+        const startDate = $('#startDate').val();
+        const startTime = $('#startTime').val();
+        const endDate = $('#endDate').val();
+        const endTime = $('#endTime').val();
+        
+        // 시작일과 종료일이 모두 입력된 경우에만 검사
+        if (!startDate || !endDate) {
+            return true;
+        }
+        
+        // 날짜+시간 조합
+        const startDateTime = startTime ? `${startDate} ${startTime}` : `${startDate} 00:00:00`;
+        const endDateTime = endTime ? `${endDate} ${endTime}` : `${endDate} 23:59:59`;
+        
+        const startDateTimeObj = new Date(startDateTime);
+        const endDateTimeObj = new Date(endDateTime);
+        
+        // 시작 시간이 종료 시간보다 늦은 경우
+        if (startDateTimeObj > endDateTimeObj) {            
+            alert('시작 날짜/시간이 종료 날짜/시간보다 늦을 수 없습니다.');
+            return false;
+        }
+        
+        // 미래 날짜 체크
+        const now = new Date();
+        if (startDateTimeObj > now || endDateTimeObj > now) {
+            alert('미래 날짜는 선택할 수 없습니다.');
+            return false;
+        }
+        
+        return true;
+    }
+
     loadInitialData() {
         this.search();
     }
@@ -132,9 +178,26 @@ class HistoryBasePage {
     }
     
     getFilters() {
+        const startDate = $('#startDate').val();
+        const startTime = $('#startTime').val();
+        const endDate = $('#endDate').val();
+        const endTime = $('#endTime').val();
+        
+        // 날짜+시간 조합
+        let startDateTime = null;
+        let endDateTime = null;
+        
+        if (startDate) {
+            startDateTime = startTime ? `${startDate} ${startTime}` : `${startDate} 00:00:00`;
+        }
+        
+        if (endDate) {
+            endDateTime = endTime ? `${endDate} ${endTime}` : `${endDate} 23:59:59`;
+        }
+        
         return {
-            startDate: $('#startDate').val(),
-            endDate: $('#endDate').val(),
+            startDateTime: startDateTime,
+            endDateTime: endDateTime,
             userId: $('#filterUserId').val().trim(),
             content: $('#filterContent').val().trim(),
             comment: $('#filterComment').val().trim()
@@ -144,15 +207,25 @@ class HistoryBasePage {
     resetFilters() {
         $('.filter-input').val('');
         
-        // 기본 날짜 재설정
-        const today = new Date();
-        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+        // 기본 날짜 및 시간 재설정 (최근 24시간)
+        const now = new Date();
+        const yesterday = new Date(now.getTime() - (24 * 60 * 60 * 1000));
         
-        $('#endDate').val(this.formatDate(today));
-        $('#startDate').val(this.formatDate(thirtyDaysAgo));
+        $('#endDate').val(this.formatDate(now));
+        $('#endTime').val(this.formatTime(now));
+        $('#startDate').val(this.formatDate(yesterday));
+        $('#startTime').val(this.formatTime(yesterday));
         
         // 초기화시에는 전체 새로고침
         this.search();
+    }
+
+    formatTime(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
     
     loadData() {

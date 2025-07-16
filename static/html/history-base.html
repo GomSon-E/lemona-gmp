@@ -8,10 +8,16 @@
             <!-- 기간 검색 -->
             <div class="filter-group">
                 <label class="filter-label" id="periodLabel">기간</label>
-                <div class="date-range">
-                    <input type="date" class="filter-input" id="startDate">
+                <div class="date-time-range">
+                    <div class="datetime-input-group">
+                        <input type="date" class="filter-input" id="startDate">
+                        <input type="time" class="filter-input" id="startTime">
+                    </div>
                     <span class="date-separator">~</span>
-                    <input type="date" class="filter-input" id="endDate">
+                    <div class="datetime-input-group">
+                        <input type="date" class="filter-input" id="endDate">
+                        <input type="time" class="filter-input" id="endTime">
+                    </div>
                 </div>
             </div>
             

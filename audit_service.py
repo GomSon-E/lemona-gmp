@@ -135,8 +135,8 @@ class AuditTrailService:
         try:
             # 쿼리 파라미터 추출
             params = dict(request.query_params)
-            start_date = params.get('startDate')
-            end_date = params.get('endDate')
+            start_datetime = params.get('startDateTime')
+            end_datetime = params.get('endDateTime')
             user_id = params.get('userId', '').strip()
             content = params.get('content', '').strip()
             comment = params.get('comment', '').strip()
@@ -190,13 +190,13 @@ class AuditTrailService:
                 where_conditions = []
                 query_params = []
                 
-                if start_date:
-                    where_conditions.append("DATE(CREATE_DT) >= %s")
-                    query_params.append(start_date)
-                
-                if end_date:
-                    where_conditions.append("DATE(CREATE_DT) <= %s")
-                    query_params.append(end_date)
+                if start_datetime:
+                    where_conditions.append("CREATE_DT >= %s")
+                    query_params.append(start_datetime)
+
+                if end_datetime:
+                    where_conditions.append("CREATE_DT <= %s")
+                    query_params.append(end_datetime)
                 
                 if user_id:
                     where_conditions.append("USER_ID LIKE %s")
