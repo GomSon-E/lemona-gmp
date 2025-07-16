@@ -201,9 +201,6 @@ async def logout_user(request: Request):
             cursor.execute(logout_history_query, (content, user_id, current_time))
             connection.commit()
 
-            # 로그아웃 시 PLC 권한 레벨을 0으로 설정
-            await plc_collector.write_user_level(0)
-            
             return JSONResponse({
                 "success": True,
                 "message": "로그아웃이 성공적으로 처리되었습니다."
