@@ -320,25 +320,19 @@ class HistoryService:
         story.append(filter_table)
         story.append(Spacer(1, 12))
         
-        # 출력 정보
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        report_info_data = [
-            ['출력일시', current_time],
-            ['총 건수', f'{len(data):,}건']
-        ]
-        
+        # 보고서 정보 섹션        
         story.append(Paragraph("보고서 정보:", heading_style))
         
         # 보고서 정보 테이블 생성
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
         # 보고서 정보 헤더와 데이터
-        report_info_header = ['출력일시', '총 건수']
-        report_info_data = [current_time, f'{len(data):,}건']
+        report_info_header = ['출력일시', '총 건수', '출력자ID']
+        report_info_data = [current_time, f'{len(data):,}건', filters.get('currentUserId', 'system')]
         report_info_table_data = [report_info_header, report_info_data]
         
         # 보고서 정보 테이블 생성
-        report_info_col_widths = [4*inch, 4*inch]
+        report_info_col_widths = [2.65*inch, 2.65*inch, 2.65*inch]
         report_info_table = Table(report_info_table_data, colWidths=report_info_col_widths)
         report_info_table.setStyle(TableStyle([
             # 헤더 스타일
