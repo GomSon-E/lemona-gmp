@@ -251,6 +251,31 @@ class HistoryService:
             korean_font = 'Helvetica'
             print(f"폰트 등록 오류: {e}")
         
+        def add_page_number(canvas, doc):
+            """페이지 번호 추가 함수"""
+            page_num = canvas.getPageNumber()
+            text = f"- {page_num} -"
+            width, height = landscape(A4)
+            
+            # 텍스트 너비 계산
+            canvas.setFont(korean_font, 10)
+            text_width = canvas.stringWidth(text, korean_font, 10)
+            
+            # 페이지 하단 중앙에 텍스트 그리기
+            x = (width - text_width) / 2
+            y = 0.5 * inch
+            canvas.drawString(x, y, text)
+        
+        # A4 가로 방향 설정
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A4),
+            rightMargin=0.5*inch,
+            leftMargin=0.5*inch,
+            topMargin=0.75*inch,
+            bottomMargin=0.75*inch  # 페이지 번호 공간을 위해 여백 증가
+        )
+        
         # A4 가로 방향 설정
         doc = SimpleDocTemplate(
             buffer,
@@ -392,7 +417,7 @@ class HistoryService:
             story.append(Paragraph("조회된 데이터가 없습니다.", normal_style))
         
         # PDF 빌드
-        doc.build(story)
+        doc.build(story, onFirstPage=add_page_number, onLaterPages=add_page_number)
         
         # 버퍼 내용 반환
         buffer.seek(0)
