@@ -48,6 +48,12 @@ function initPasswordChangePage() {
                     $('#passwordChangeForm')[0].reset();
                     $('.form-input').css('border-color', 'rgba(4, 7, 7, 0.2)');
                     updatePasswordRequirements('');
+                    
+                    // 비밀번호 변경 완료 후 전역 함수 호출
+                    if (typeof window.onPasswordChangeSuccess === 'function') {
+                        window.onPasswordChangeSuccess();
+                    }
+                    
                 } else {
                     alert(response.message);
                 }

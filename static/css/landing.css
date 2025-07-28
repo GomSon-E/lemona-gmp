@@ -478,6 +478,58 @@ body {
     border-top-color: #FFFFFF;
 }
 
+/* 햄버거 메뉴 비활성화 상태 */
+.hamburger.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.hamburger.disabled:hover {
+    background-color: transparent;
+}
+
+.hamburger.disabled div {
+    background-color: #666;
+}
+
+/* 비밀번호 변경 필요시 사이드바 비활성화 */
+.sidebar.password-required {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.sidebar.password-required .main-menu {
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+}
+
+.sidebar.password-required .main-menu:hover {
+    background-color: #f8f9fa;
+}
+
+.sidebar.password-required .sub-menu-item {
+    cursor: not-allowed;
+    color: #999;
+}
+
+.sidebar.password-required .sub-menu-item:hover {
+    background-color: transparent;
+    padding-left: 40px;
+}
+
+/* 비밀번호 변경 페이지만 활성화 */
+.sidebar.password-required .sub-menu-item[data-page="password-change"] {
+    cursor: pointer;
+    color: #040707;
+    pointer-events: auto;
+}
+
+.sidebar.password-required .sub-menu-item[data-page="password-change"]:hover {
+    background-color: #FFFAD1;
+    padding-left: 45px;
+}
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }

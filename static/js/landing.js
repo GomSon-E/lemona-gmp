@@ -2,6 +2,9 @@ $(document).ready(function() {
    // 초기화
    if (!checkUserLogin()) return;
 
+   // 전역 변수 추가
+   window.passwordChangeRequired = false;
+
    // 자동 로그아웃 초기화
    initAutoLogout();
    
@@ -297,6 +300,9 @@ $(document).ready(function() {
    function checkForcePasswordChange() {
        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
+       // 비밀번호 변경 필요 여부를 전역 변수에 저장
+       window.passwordChangeRequired = currentUser.passwordChangeRequired;
+
        // 모든 경우에 코멘트 모달을 먼저 표시
        setTimeout(() => {
            showCommentModal(() => {
@@ -305,6 +311,8 @@ $(document).ready(function() {
                    setTimeout(() => {
                        loadPage('password-change');
                        alert(currentUser.passwordChangeReason);
+                       // 사이드바 비활성화
+                       updateSidebarState();
                    }, 300);
                }
            });
@@ -394,7 +402,13 @@ $(document).ready(function() {
 
    function setupEventListeners() {
        // 햄버거 메뉴
-       $('#hamburger').click(() => toggleSidebar());
+       $('#hamburger').click(() => {
+           if (window.passwordChangeRequired) {
+               alert('비밀번호를 먼저 변경해주세요.');
+               return;
+           }
+           toggleSidebar();
+       });
        $('#sidebarOverlay').click(() => closeSidebar());
 
        // 로그아웃 버튼
@@ -402,11 +416,20 @@ $(document).ready(function() {
        
        // 동적 메뉴 이벤트
        $(document).on('click', '.main-menu', function() {
+           if (window.passwordChangeRequired) {
+               alert('비밀번호를 먼저 변경해주세요.');
+               return;
+           }
            toggleMainMenu($(this));
        });
        
        $(document).on('click', '.sub-menu-item', function() {
-           handlePageNavigation($(this).data('page'));
+           const page = $(this).data('page');
+           if (window.passwordChangeRequired && page !== 'password-change') {
+               alert('비밀번호를 먼저 변경해주세요.');
+               return;
+           }
+           handlePageNavigation(page);
        });
        
        // 키보드/윈도우 이벤트
@@ -583,11 +606,6 @@ $(document).ready(function() {
         if (window.currentPageCleanup) {
             window.currentPageCleanup();
         }
-
-        // loadPage 호출 시 자동 로그아웃 타이머 리셋
-        if (window.resetAutoLogoutTimer) {
-            window.resetAutoLogoutTimer();
-        }
         
         // 조회 페이지들은 공통 템플릿과 CSS 사용
         const historyPages = [
@@ -659,3 +677,46 @@ $(document).ready(function() {
     }
 
 });
+
+// ! 전역 함수로 사이드바 상태 업데이트 함수 노출
+window.updateSidebarState = function() {
+    const $hamburger = $('#hamburger');
+    const $sidebar = $('#sidebar');
+    
+    if (window.passwordChangeRequired) {
+        // 비밀번호 변경 필요시 사이드바 비활성화
+        $hamburger.addClass('disabled').attr('title', '비밀번호를 먼저 변경해주세요.');
+        $sidebar.addClass('password-required');
+        console.log('사이드바 비활성화됨');
+    } else {
+        // 정상 상태시 사이드바 활성화
+        $hamburger.removeClass('disabled').removeAttr('title');
+        $sidebar.removeClass('password-required');
+        console.log('사이드바 활성화됨');
+    }
+};
+
+// ! 비밀번호 변경 완료 처리 함수
+window.onPasswordChangeSuccess = function() {
+    console.log('비밀번호 변경 성공 처리');
+    
+    // 전역 변수 업데이트
+    window.passwordChangeRequired = false;
+    
+    // localStorage의 사용자 정보 업데이트
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    currentUser.passwordChangeRequired = false;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // 사이드바 다시 활성화
+    window.updateSidebarState();
+    
+    // 메인 대시보드로 이동
+    setTimeout(() => {
+        $('.dashboard-container').html(`
+            <div class="logo-placeholder">
+                <img src="static/img/logo.png" alt="(주)경남제약 로고">
+            </div>
+        `);
+    }, 500);
+};
