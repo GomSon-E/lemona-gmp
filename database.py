@@ -7,7 +7,7 @@ MYSQL_CONFIG = {
     'host': 'localhost',
     'database': 'LEMONA_GMP',
     'user': 'root',
-    'password': '1234',
+    'password': '1234!',
     'port': 3306,
     'charset': 'utf8mb4',
     'collation': 'utf8mb4_unicode_ci'

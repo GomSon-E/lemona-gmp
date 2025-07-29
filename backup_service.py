@@ -8,12 +8,12 @@ import tempfile
 from database import get_db_connection
 
 # 백업 설정
-BACKUP_DIR = "./backup"
+BACKUP_DIR = "C:/Users/ppaa2/OneDrive/Desktop/디밀리언/backup"
 MYSQL_CONFIG = {
     'host': 'localhost',
     'database': 'LEMONA_GMP',
     'user': 'root',
-    'password': '1234',
+    'password': '1234!',
     'port': 3306
 }
 

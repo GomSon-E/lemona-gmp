@@ -8,10 +8,10 @@ fake = Faker('ko_KR')
 
 # 데이터베이스 연결 설정
 MYSQL_CONFIG = {
-    'host': 'localhost',
+    'host': 'localhost!',
     'database': 'LEMONA_GMP',
     'user': 'root',
-    'password': '1234',
+    'password': '1234!',
     'port': 3306,
     'charset': 'utf8mb4'
 }
