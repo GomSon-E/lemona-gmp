@@ -51,10 +51,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app = FastAPI(
-    title="보틀포장 1호기 데이터 & 권한 관리 S/W API",
-    lifespan=lifespan
-)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
@@ -190,4 +186,5 @@ async def export_audit_trail_api(request: Request):
     return await export_audit_trail(request)
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
